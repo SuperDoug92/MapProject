@@ -20,6 +20,7 @@ function RightControl(controlDiv, map) {
   // Set CSS for the control border.
   var controlUI = document.createElement('div');
 
+  controlUI.id = "nav_control";
   controlUI.style.margin = '12px';
   controlUI.style.backgroundColor = '#fff';
   controlUI.style.border = '2px solid #fff';
@@ -36,9 +37,18 @@ function RightControl(controlDiv, map) {
   controlUI.appendChild(controlImg);
 
   // Setup the click event listeners: simply set the map to Chicago.
-  controlUI.addEventListener('click', function() {
+  var nav_menu = document.getElementById("nav");
+  var map_div = document.getElementById("map");
+  controlUI.addEventListener('click', function(e) {
+    nav_menu.classList.toggle('open');
+    e.stopPropagation();
   });
-
+  map_div.addEventListener('click',function(e) {
+    if (nav_menu.classList.contains('open')){
+      nav_menu.classList.toggle('open');
+      e.stopPropagation();
+    }
+  })
 }
 function initMap(initialLocation) {
   var mapDiv = document.getElementById('map');
