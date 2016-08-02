@@ -36,7 +36,7 @@ function RightControl(controlDiv, map) {
   controlImg.style.height = '36px';
   controlUI.appendChild(controlImg);
 
-  // Setup the click event listeners: simply set the map to Chicago.
+  // Setup the click event listeners
   var nav_menu = document.getElementById("nav");
   var map_div = document.getElementById("map");
   controlUI.addEventListener('click', function(e) {
@@ -60,4 +60,33 @@ function initMap(initialLocation) {
   var rightControl = new RightControl(rightControlDiv, map);
   rightControlDiv.index = 1;
   map.controls[google.maps.ControlPosition.RIGHT_TOP].push(rightControlDiv);
+}
+
+var submit_location = document.getElementById("submit_location");
+submit_location.addEventListener('click', function(e){
+  zoomToArea();
+})
+
+function zoomToArea() {
+  // Initialize the geocoder.
+  var geocoder = new google.maps.Geocoder();
+  // Get the address or place that the user entered.
+  var address = document.getElementById('input_location').value;
+  // Make sure the address isn't blank.
+  if (address == '') {
+    window.alert('You must enter an area, or address.');
+  } else {
+    geocoder.geocode(
+      {address: address}, function(results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+          var resultBounds = new google.maps.LatLngBounds(
+            results[0].geometry.viewport.getSouthWest(),     results[0].geometry.viewport.getNorthEast()
+          );
+          map.fitBounds(resultBounds);
+        } else {
+          window.alert('We could not find that location - try entering a more' +
+              ' specific place.');
+        }
+      });
+  }
 }

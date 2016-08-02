@@ -1,14 +1,16 @@
 #nav {
   position: absolute;
   z-index: 99;
-  width: 300px;
+  width: 340px;
   height: 100%;
-  background-color: black;
+  background-color: #fff;
+  border: 1px solid #999;
+  border-radius: 3px;
+  padding: 10px 10px 30px 10px;
+  text-align: left;
   right:0px;
-  /* This transform moves the drawer off canvas. */
-  -webkit-transform: translate(300px, 0);
-  transform: translate(300px, 0);
-  /* Optionally, we animate the drawer. */
+  -webkit-transform: translate(400px, 0);
+  transform: translate(400px, 0);
   transition: transform 0.3s ease;
 }
 #nav.open {
