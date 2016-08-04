@@ -66,6 +66,13 @@ var submit_location = document.getElementById("submit_location");
 submit_location.addEventListener('click', function(e){
   zoomToArea();
 })
+var address = document.getElementById('input_location');
+address.addEventListener('keypress', function (e) {
+  var key = e.which || e.keyCode;
+  if (key === 13) {
+    zoomToArea();
+  }
+})
 
 function zoomToArea() {
   // Initialize the geocoder.

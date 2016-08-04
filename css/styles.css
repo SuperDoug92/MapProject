@@ -17,22 +17,32 @@
   -webkit-transform: translate(0, 0);
   transform: translate(0, 0);
 }
-
-.dark_blue{
-  background-color: #2A457A;
-}
 html, body { height:100%; }
 #map {
   height: 100%;
   z-index: 0;
-  /*position:absolute;*/
 }
 #menu{
-  /*position:relative;*/
   z-index:1;
-  width:100px;
+  width:300px;
 }
 #mapContainer{
   position: relative;
   height:100%;
+}
+.jumbotron h1{
+    font-size: 30px;
+    text-align:center;
+}
+.jumbotron{
+  padding-top: 2px;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  border-radius:5px;
+}
+.col-md-12{
+  padding:0px;
+}
+.input-group{
+  margin-bottom: 10px;
 }
