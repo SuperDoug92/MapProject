@@ -48,7 +48,7 @@ function RightControl(controlDiv, map) {
       nav_menu.classList.toggle('open');
       e.stopPropagation();
     }
-  })
+  });
 }
 function initMap(initialLocation) {
   var mapDiv = document.getElementById('map');
@@ -60,19 +60,22 @@ function initMap(initialLocation) {
   var rightControl = new RightControl(rightControlDiv, map);
   rightControlDiv.index = 1;
   map.controls[google.maps.ControlPosition.RIGHT_TOP].push(rightControlDiv);
+  loadWiki();
 }
 
 var submit_location = document.getElementById("submit_location");
 submit_location.addEventListener('click', function(e){
   zoomToArea();
-})
+  loadWiki();
+});
 var address = document.getElementById('input_location');
 address.addEventListener('keypress', function (e) {
   var key = e.which || e.keyCode;
   if (key === 13) {
     zoomToArea();
+    loadWiki();
   }
-})
+});
 
 function zoomToArea() {
   // Initialize the geocoder.
@@ -96,4 +99,55 @@ function zoomToArea() {
         }
       });
   }
+}
+
+function loadWiki(){
+  var $wikiElem = $('#wiki');
+  var geocoder = new google.maps.Geocoder();
+  var address;
+  geocoder.geocode({'location': map.center}, function(results, status) {
+    if (status === 'OK') {
+      if (results[1]) {
+        results[1].address_components.forEach(function(object){
+          if (object.types[0] == "locality"){
+            address += object.long_name;
+          }
+          else if (object.types[0] == "administrative_area_level_1"){
+            address += object.long_name;
+          }
+        });
+        sendWikiRequest(address);
+      }
+      else {
+        window.alert('No results found');
+      }
+    }
+    else {
+      window.alert('Geocoder failed due to: ' + status);
+    }
+  });
+}
+function sendWikiRequest(address){
+  var wikiURL = 'https://en.wikipedia.org/w/api.php';
+    wikiURL += '?' + $.param({
+      'action':'opensearch',
+      'search': address,
+      'format':'json',
+    });
+  $.ajax({
+    url: wikiURL,
+    dataType: 'jsonp',
+    headers: { 'Api-User-Agent': 'Example/1.0' },
+    success: function(data) {
+      data[1].forEach(function(result,index){
+        var HTMLStr = "<a style='display:block' href='" + data[3][index] +"'><h3>" +
+        result + "</h3><span>"+
+        data[2][index] + "</span></a><hr>";
+        $wikiElem.append(HTMLStr);
+      });
+    },
+    error: function(err){
+      console.log("JSONP failed");
+    }
+  });
 }
