@@ -109,11 +109,11 @@ function loadWiki(){
     if (status === 'OK') {
       if (results[1]) {
         results[1].address_components.forEach(function(object){
-          if (object.types[0] == "locality"){
-            address += object.long_name;
+          if ($.inArray("locality", object.types)>-1 || $.inArray("sublocality_level_1", object.types)>-1){
+            address = object.long_name;
           }
-          else if (object.types[0] == "administrative_area_level_1"){
-            address += object.long_name;
+          else if ($.inArray("administrative_area_level_1", object.types)>-1){
+            address += ", " + object.long_name;
           }
         });
         sendWikiRequest(address);
@@ -139,11 +139,12 @@ function sendWikiRequest(address){
     dataType: 'jsonp',
     headers: { 'Api-User-Agent': 'Example/1.0' },
     success: function(data) {
+      console.log(data);
       data[1].forEach(function(result,index){
         var HTMLStr = "<a style='display:block' href='" + data[3][index] +"'><h3>" +
         result + "</h3><span>"+
         data[2][index] + "</span></a><hr>";
-        $wikiElem.append(HTMLStr);
+        $('#wiki').append(HTMLStr);
       });
     },
     error: function(err){
