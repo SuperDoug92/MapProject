@@ -139,12 +139,11 @@ function sendWikiRequest(address){
     dataType: 'jsonp',
     headers: { 'Api-User-Agent': 'Example/1.0' },
     success: function(data) {
-      console.log(data);
       data[1].forEach(function(result,index){
-        var HTMLStr = "<a style='display:block' href='" + data[3][index] +"'><h3>" +
+        var HTMLStr = "<a class='menu-link' target='_blank' href='" + data[3][index] +"'><h3>" +
         result + "</h3><span>"+
         data[2][index] + "</span></a><hr>";
-        $('#wiki').append(HTMLStr);
+        $('#wiki-results').append(HTMLStr);
       });
     },
     error: function(err){
@@ -152,3 +151,9 @@ function sendWikiRequest(address){
     }
   });
 }
+
+$('#wiki-button').click(function(){
+  console.log($('#wiki-results'));
+  console.log("list:" + $('#wiki-results').classList);
+  $('#wiki-results').toggleClass('show');
+});

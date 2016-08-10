@@ -10,9 +10,10 @@
   padding: 10px 10px 30px 10px;
   text-align: left;
   right:0px;
-  -webkit-transform: translate(400px, 0);
+  overflow: hidden;
+  /*-webkit-transform: translate(400px, 0);
   transform: translate(400px, 0);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease;*/
 }
 #nav.open {
   -webkit-transform: translate(0, 0);
@@ -53,4 +54,22 @@ html, body { height:100%; }
 }
 .input-group{
   margin-bottom: 10px;
+}
+.nav-button-group{
+  min-width: 300px;
+}
+
+/*.overflow{
+  overflow-y: scroll;
+}*/
+
+#wiki-results{
+  border-left: 1px solid #999;
+  border-right: 1px solid #999;
+  width: 300px;
+  padding: 0 10px 0 10px;
+  display:none;
+}
+#wiki-results.show{
+  display:block;
 }
