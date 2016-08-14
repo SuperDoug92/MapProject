@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="../css/styles.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js"></script>
   </head>
   <body>
     <div id="mapContainer">
@@ -31,11 +32,12 @@
         </div>
       </nav>
 
-      <div id="map">
+      <div id="map" data-bind="map:Map">
       </div>
     </div>
     <script  src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyC7Bf8tdQqYE6T9_MoUhunsO2X5EuY-sfQ">
     </script>
+    <script src="../js/viewmodel.js"></script>
     <script async src="../js/main.js">
     </script>
 
