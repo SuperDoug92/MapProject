@@ -36,7 +36,7 @@ function getUserLocation(callback){
 
 var geocoder = new google.maps.Geocoder();
 
-function geocode(address){
+function geocode(address, callback){
   // Make sure the address isn't blank.
   if (address == '') {
     window.alert('You must enter an area, or address.');
@@ -75,18 +75,15 @@ function reverseGeocode(latlng, callback){
 
 var Map = function(location){
   var self = this;
-  self.location = location;
+  self.location = ko.observable(location);
+  self.address = ko.observable();
   reverseGeocode(location, function(returned_address){
-    self.address = ko.observable(returned_address);
+    self.address(returned_address);
   });
 }
 function ViewModel(location) {
   var self = this;
   self.Map = ko.observable(new Map(location));
-  setTimeout(function(){
-    self.Map.valueHasMutated();
-  }, 300);
-
 }
 
 function setViewModel(location){
