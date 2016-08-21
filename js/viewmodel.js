@@ -2,15 +2,12 @@
 ko.bindingHandlers.map = {
 
   init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
-      var mapObj = ko.utils.unwrapObservable(valueAccessor());
-      var latLng = new google.maps.LatLng(
-          ko.utils.unwrapObservable(mapObj.lat),
-          ko.utils.unwrapObservable(mapObj.lng));
-      var mapOptions = { center: latLng,
-                        zoom: 8,
-                      };
-
-      mapObj.googleMap = new google.maps.Map(element, mapOptions);
+    var mapObj = ko.utils.unwrapObservable(valueAccessor());
+    var latLng = new google.maps.LatLng(
+      ko.utils.unwrapObservable(mapObj.location)
+    );
+    var mapOptions = { center: latLng, zoom: 12};
+    mapObj.googleMap = new google.maps.Map(element, mapOptions);
   }
 };
 
@@ -37,8 +34,9 @@ function getUserLocation(callback){
   return userLocation;
 }
 
+var geocoder = new google.maps.Geocoder();
+
 function geocode(address){
-  var geocoder = new google.maps.Geocoder();
   // Make sure the address isn't blank.
   if (address == '') {
     window.alert('You must enter an area, or address.');
@@ -54,14 +52,41 @@ function geocode(address){
   }
 }
 
-function reverseGeocode(){
-
+function reverseGeocode(latlng, callback){
+  geocoder.geocode({'location': latlng}, function(results, status) {
+    if (status === 'OK') {
+      if (results) {
+        result=results[0].address_components;
+          var components=[];
+          for(var i=0;i<result.length;++i)
+          {
+            if(result[i].types[0]=="administrative_area_level_1"){components.push(result[i].long_name)}
+            if(result[i].types[0]=="locality"){components.unshift(result[i].long_name)}
+          }
+        callback(components.join(', '));
+      } else {
+        window.alert('No results found');
+      }
+    } else {
+      window.alert('Geocoder failed due to: ' + status);
+    }
+  });
 }
 
+var Map = function(location){
+  var self = this;
+  self.location = location;
+  reverseGeocode(location, function(returned_address){
+    self.address = ko.observable(returned_address);
+  });
+}
 function ViewModel(location) {
   var self = this;
-  self.Map = ko.observable(location);
-  self.map_location = ko.observable("Alexandria, VA");
+  self.Map = ko.observable(new Map(location));
+  setTimeout(function(){
+    self.Map.valueHasMutated();
+  }, 300);
+
 }
 
 function setViewModel(location){
