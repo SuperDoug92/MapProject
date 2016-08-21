@@ -31,18 +31,17 @@
           </div>
         </div>
       </nav>
-
-      <div id="hamburger">
+      <div id="hamburger" data-bind="click:toggleNav, clickBubble: false">
         <img id = "hamburger_icon"src='../images/menu_icon.png'>
       </div>
-      <div id="map" data-bind="map:Map">
-      </div>
+      <div id="map" data-bind="map:Map, click:hideNav, clickBubble: false">
     </div>
-    <script  src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyC7Bf8tdQqYE6T9_MoUhunsO2X5EuY-sfQ">
-    </script>
-    <script src="../js/viewmodel.js"></script>
-    <script async src="../js/main.js">
-    </script>
+  </div>
+  <script  src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyC7Bf8tdQqYE6T9_MoUhunsO2X5EuY-sfQ">
+  </script>
+  <script src="../js/viewmodel.js"></script>
+  <script async src="../js/main.js">
+  </script>
 
 
  </body>

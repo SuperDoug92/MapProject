@@ -95,6 +95,13 @@ function ViewModel(location) {
     };
     return true;
   };
+  var nav_menu = $("#nav");
+  self.toggleNav = function(){
+      nav_menu.toggleClass("open");
+  }
+  self.hideNav = function(){
+    nav_menu.removeClass("open");
+  }
 }
 
 function setViewModel(location){
