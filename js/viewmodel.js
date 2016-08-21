@@ -44,7 +44,10 @@ function geocode(address, callback){
     geocoder.geocode(
       {address: address}, function(results, status) {
         if (status == google.maps.GeocoderStatus.OK) {
-          console.log(results);
+          var resultBounds = new google.maps.LatLngBounds(
+            results[0].geometry.viewport.getSouthWest(),     results[0].geometry.viewport.getNorthEast()
+          );
+          callback(resultBounds);
         } else {
           window.alert('We could not find that location - try entering a more specific place.');
         }
@@ -84,6 +87,14 @@ var Map = function(location){
 function ViewModel(location) {
   var self = this;
   self.Map = ko.observable(new Map(location));
+  self.updateMap = function (data, event) {
+    if (event.which == 13 || event.which == 1) {
+      geocode(self.Map().address(), function(returned_latlng){
+        self.Map().googleMap.fitBounds(returned_latlng);
+      })
+    };
+    return true;
+  };
 }
 
 function setViewModel(location){
