@@ -19,16 +19,6 @@
   -webkit-transform: translate(0, 0);
   transform: translate(0, 0);
 }
-
-#wiki{
-  position: absolute;
-  z-index: 97;
-  height: 100%;
-  width:100%;
-  /*left: -100vw;*/
-  background-color: #fff;
-  text-align: left;
-}
 html, body { height:100%; }
 #map {
   height: 100%;
@@ -97,4 +87,21 @@ html, body { height:100%; }
 #commute-form.open{
   padding:5px 2px 0px;
   height:180px;
+}
+
+.input-group-addon {
+    min-width:70px;// if you want width please write here //
+}
+
+.alert{
+  z-index:5;
+  position: absolute;
+  text-align: center;
+}
+
+.alert.fadeout{
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 1s, opacity 1s linear;
+  transition-delay: 2.5s;
 }

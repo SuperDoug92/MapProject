@@ -34,15 +34,21 @@ function getUserLocation(callback){
       callback(userLocation);
     }, function() {
       // handleNoGeolocation(browserSupportFlag);
-      alert("User location not available, displaying Washington, DC");
-      userLocation = {lat:38.9072, lng:77.0369};
+      $(".alert").show();
+      $(".alert").toggleClass("fadeout");
+      // $(".alert").alert('close')
+      // alert("User location not available, displaying Washington, DC");
+      userLocation = {lat:38.897299, lng:-77.0369};
       callback(userLocation);
     });
   }
   // Browser doesn't support Geolocation
   else {
-    alert("User location not available, displaying Washington, DC");
-    userLocation = {lat:38.9072, lng:77.0369};
+    $(".alert").show();
+    $(".alert").toggleClass("fadeout");
+    // $(".alert").alert('close')
+    // alert("User location not available, displaying Washington, DC");
+    userLocation = {lat:38.9072, lng:-77.0369};
     callback(userLocation);
   }
   return userLocation;
