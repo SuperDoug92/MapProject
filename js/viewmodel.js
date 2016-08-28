@@ -6,8 +6,22 @@ ko.bindingHandlers.map = {
     var latLng = new google.maps.LatLng(
       ko.utils.unwrapObservable(mapObj.location)
     );
-    var mapOptions = { center: latLng, zoom: 12};
+    var mapOptions = {center: latLng, zoom: 12};
     mapObj.googleMap = new google.maps.Map(element, mapOptions);
+  }
+};
+ko.bindingHandlers.TravelTime = {
+
+  init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+    var TravelTimeObj = ko.utils.unwrapObservable(valueAccessor());
+
+    TravelTimeObj.traveltime = new walkscore.TravelTime({
+      map    : TravelTimeObj.map,
+      mode   : TravelTimeObj.mode,
+      time   : TravelTimeObj.time,
+      origin : TravelTimeObj.origin,
+      color  : TravelTimeObj.color
+    });
   }
 };
 
@@ -84,8 +98,17 @@ var Map = function(location){
     self.address(returned_address);
   });
 }
+var TravelTime = function(mode,time,latlng){
+  var self = this;
+  self.mode = mode;
+  self.time = time;
+  self.origin = ""
+  // latlng.lat + "," + latlng.lng
+  self.color = '#0000FF';
+}
 function ViewModel(location) {
   var self = this;
+  //map
   self.Map = ko.observable(new Map(location));
   self.updateMap = function (data, event) {
     if (event.which == 13 || event.which == 1) {
@@ -95,13 +118,24 @@ function ViewModel(location) {
     };
     return true;
   };
+  //nav behavior
   var nav_menu = $("#nav");
+  var commute_form = $("#commute-form");
   self.toggleNav = function(){
-      nav_menu.toggleClass("open");
+    nav_menu.toggleClass("open");
   }
   self.hideNav = function(){
     nav_menu.removeClass("open");
   }
+  self.toggleCommute = function(){
+    commute_form.toggleClass("open");
+    console.log(commute_form);
+  }
+  // //traveltime
+  // self.TravelTime = ko.observable(new TravelTime(location));
+  // traveltime.on('show', function(){
+  //   map.fitBounds(traveltime.getBounds());
+  // });
 }
 
 function setViewModel(location){
@@ -110,3 +144,18 @@ function setViewModel(location){
 };
 
 getUserLocation(setViewModel);
+
+// var map = new google.maps.Map(
+//   document.getElementById("map_container"),
+//   { mapTypeId: google.maps.MapTypeId.ROADMAP }
+// );
+// var traveltime = new walkscore.TravelTime({
+//   map    : map,
+//   mode   : walkscore.TravelTime.Mode.WALK,
+//   time   : 15,
+//   origin : '47.61460,-122.31704',
+//   color  : '#0000FF'
+// });
+// traveltime.on('show', function(){
+//   map.fitBounds(traveltime.getBounds());
+// });

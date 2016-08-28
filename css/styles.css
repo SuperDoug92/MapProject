@@ -13,7 +13,7 @@
   overflow: hidden;
   -webkit-transform: translate(400px, 0);
   transform: translate(340px, 0);
-  transition: transform 0.3s ease;
+  transition: transform 0.4s ease;
 }
 #nav.open {
   -webkit-transform: translate(0, 0);
@@ -60,21 +60,6 @@ html, body { height:100%; }
   min-width: 300px;
 }
 
-/*.overflow{
-  overflow-y: scroll;
-}*/
-
-#wiki-results{
-  border-left: 1px solid #999;
-  border-right: 1px solid #999;
-  width: 300px;
-  padding: 0 10px 0 10px;
-  display:none;
-}
-#wiki-results.show{
-  display:block;
-}
-
 #hamburger{
   width:48px;
   height: 44px;
@@ -86,9 +71,30 @@ html, body { height:100%; }
   border:2px solid #fff;
   border-radius: 3px;
   box-shadow: 0 2px 6px rgba(0,0,0,.3);
-
 }
+
 #hamburger_icon{
   width:44px;
   height:40px;
+}
+
+.row{
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+#commute-form{
+  padding:0px;
+  height:0px;
+  border-left:1px solid #ccc;
+  border-right:1px solid #ccc;
+  overflow: hidden;
+  -webkit-transition: height 1s ease;
+  -moz-transition: height 1s ease;
+  -o-transition: height 1s ease;
+  transition: height .5s ease;
+}
+#commute-form.open{
+  padding:5px 2px 0px;
+  height:180px;
 }

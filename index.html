@@ -13,20 +13,40 @@
   <body>
     <div id="mapContainer">
       <nav id="nav">
-        <div class="jumbotron">
-          <h1>Neighborhood Explorer</h1>
-        </div>
-        <div class="col-md-12">
-          <div class="input-group">
-            <input id = "input_location" type="text" class="form-control" data-bind="textInput: Map().address, event: { keypress:updateMap}">
-            <span class="input-group-btn">
-              <button id="submit_location" class="btn btn-default" type="button" data-bind="click: updateMap">Go!</button>
-            </span>
+        <div class="row">
+          <div class="jumbotron">
+            <h1>Neighborhood Explorer</h1>
           </div>
-        <div class = "col-md-12 overflow">
+        </div>
+        <div class="row">
+            <div class="input-group">
+              <input id = "input_location" type="text" class="form-control" data-bind="textInput: Map().address, event: { keypress:updateMap}">
+              <span class="input-group-btn">
+                <button id="submit_location" class="btn btn-default" type="button" data-bind="click: updateMap">Go!</button>
+              </span>
+            </div>
+        </div>
+        <div class = "row">
           <div class="btn-group-vertical btn-group-lg col-md-12 nav-button-group" role="group" aria-label="...">
-            <button type="button" id="wiki-button" class="btn btn-default col-md-12">Wikipedia</button>
-            <div id="wiki-results" class=""></div>
+            <button type="button" id="commute-button" class="btn btn-default col-md-12" data-bind="click:toggleCommute, clickBubble: false">Commute</button>
+            <div id="commute-form">
+              <div class="input-group">
+                <span class="input-group-addon" id="basic-addon1">Drive</span>
+                <input type="text" class="form-control" placeholder="time(min)" aria-describedby="basic-addon1">
+              </div>
+              <div class="input-group">
+                <span class="input-group-addon" id="basic-addon1">Transit</span>
+                <input type="text" class="form-control" placeholder="time(min)" aria-describedby="basic-addon1">
+              </div>
+              <div class="input-group">
+                <span class="input-group-addon" id="basic-addon1">Walk</span>
+                <input type="text" class="form-control" placeholder="time(min)" aria-describedby="basic-addon1">
+              </div>
+              <div class="input-group">
+                <span class="input-group-addon" id="basic-addon1">Bike</span>
+                <input type="text" class="form-control" placeholder="time(min)" aria-describedby="basic-addon1">
+              </div>
+            </div>
             <button type="button" class="btn btn-default  col-md-12">Zillow</button>
           </div>
         </div>
@@ -38,6 +58,9 @@
     </div>
   </div>
   <script  src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyC7Bf8tdQqYE6T9_MoUhunsO2X5EuY-sfQ">
+  </script>
+  <script type="text/javascript"
+  src="//apicdn.walkscore.com/api/v1/traveltime/js?wsid=9ab7850bead42dcd96aed94d03ccd538">
   </script>
   <script src="../js/viewmodel.js"></script>
   <script async src="../js/main.js">
