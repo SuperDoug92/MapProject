@@ -7,23 +7,24 @@ ko.bindingHandlers.map = {
       ko.utils.unwrapObservable(mapObj.location)
     );
     var mapOptions = {center: latLng, zoom: 12};
-    mapObj.googleMap = new google.maps.Map(element, mapOptions);
+    mapObj.googleMap = ko.observable(new google.maps.Map(element, mapOptions));
   }
-};
-ko.bindingHandlers.TravelTime = {
 
-  init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
-    var TravelTimeObj = ko.utils.unwrapObservable(valueAccessor());
-
-    TravelTimeObj.traveltime = new walkscore.TravelTime({
-      map    : TravelTimeObj.map,
-      mode   : TravelTimeObj.mode,
-      time   : TravelTimeObj.time,
-      origin : TravelTimeObj.origin,
-      color  : TravelTimeObj.color
-    });
-  }
 };
+// ko.bindingHandlers.TravelTime = {
+//
+//   init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+//     var TravelTimeObj = ko.utils.unwrapObservable(valueAccessor());
+//
+//     TravelTimeObj.traveltime = new walkscore.TravelTime({
+//       map    : TravelTimeObj.map,
+//       mode   : TravelTimeObj.mode,
+//       time   : TravelTimeObj.time,
+//       origin : TravelTimeObj.origin,
+//       color  : TravelTimeObj.color
+//     });
+//   }
+// };
 
 // get location, then set viewModel
 function getUserLocation(callback){
@@ -104,14 +105,15 @@ var Map = function(location){
     self.address(returned_address);
   });
 }
-var TravelTime = function(mode,time,latlng){
-  var self = this;
-  self.mode = mode;
-  self.time = time;
-  self.origin = ""
-  // latlng.lat + "," + latlng.lng
-  self.color = '#0000FF';
-}
+// var TravelTime = function(mode,time,latlng){
+//   var self = this;
+//   self.mode = mode;
+//   self.time = time;
+//   self.origin = ""
+//   // latlng.lat + "," + latlng.lng
+//   self.color = '#0000FF';
+//   console.log(self);
+// }
 function ViewModel(location) {
   var self = this;
   //map
@@ -120,8 +122,9 @@ function ViewModel(location) {
     if (event.which == 13 || event.which == 1) {
       geocode(self.Map().address(), function(returned_latlng){
         self.Map().googleMap.fitBounds(returned_latlng);
+        self.Map.location = returned_latlng;
       })
-    };
+    }
     return true;
   };
   //nav behavior
@@ -137,12 +140,41 @@ function ViewModel(location) {
     commute_form.toggleClass("open");
     console.log(commute_form);
   }
-  // //traveltime
-  // self.TravelTime = ko.observable(new TravelTime(location));
-  // traveltime.on('show', function(){
-  //   map.fitBounds(traveltime.getBounds());
-  // });
+  setTimeout(function(){
+    var traveltime = new walkscore.TravelTime({
+    map    : self.Map().googleMap(),
+    mode   : walkscore.TravelTime.Mode.WALK,
+    time   : 15,
+    origin : '38.897299,-77.0369',
+    color  : '#0000FF'
+    });
+    console.log(traveltime);
+    console.log(traveltime.getBounds());
+     var bounds = new google.maps.LatLngBounds()
+     bounds.extend({lat:38.897299, lng:-77.0369})
+     bounds.extend({lat:32, lng:-75})
+    self.Map().googleMap().fitBounds(bounds);
+  },500);
+
 }
+
+//   //traveltime
+//   self.traveltime = ko.observable(new walkscore.TravelTime({
+//     map    : self.Map().googleMap,
+//     mode   : walkscore.TravelTime.Mode.WALK,
+//     time   : 15,
+//     origin : self.Map().location().lat + ","+self.Map().location().lng,
+//     color  : '#0000FF',
+//   }));
+//
+//   // self.traveltime().on('show', function(){
+//   // setTimeout(function(){
+//   console.log(self.traveltime().getBounds());
+//     self.Map().fitBounds(self.traveltime().getBounds());
+//   // },500);
+//     // map.fitBounds(traveltime.getBounds());
+//   // });
+// }
 
 function setViewModel(location){
   viewModel = new ViewModel(location);
