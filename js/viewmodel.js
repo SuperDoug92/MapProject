@@ -1,14 +1,5 @@
-// custom bindingHandlers
-ko.bindingHandlers.map = {
-  init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
-    var mapObj = ko.utils.unwrapObservable(valueAccessor());
-    var latLng = new google.maps.LatLng(
-      ko.utils.unwrapObservable(mapObj.location)
-    );
-    var mapOptions = {center: latLng, zoom: 12};
-    mapObj.googleMap = ko.observable(new google.maps.Map(element, mapOptions));
-  }
-};
+var latlng;
+var map, geocoder;
 
 function getUserLocation(callback){
   var userLocation = {};
@@ -35,7 +26,6 @@ function getUserLocation(callback){
   }
   return userLocation;
 }
-var geocoder = new google.maps.Geocoder();
 function geocode(address, callback){
   // Make sure the address isn't blank.
   if (address == '') {
@@ -75,86 +65,53 @@ function reverseGeocode(latlng, callback){
   });
 }
 
-var Map = function(location){
-  var self = this;
-  self.location = ko.observable(location);
-  self.address = ko.observable();
-  reverseGeocode(location, function(returned_address){
-    self.address(returned_address);
-  });
-}
-// var TravelTime = function(mode,time,latlng){
-//   var self = this;
-//   self.mode = mode;
-//   self.time = time;
-//   self.origin = ""
-//   // latlng.lat + "," + latlng.lng
-//   self.color = '#0000FF';
-//   console.log(self);
-// }
 function ViewModel(location) {
   var self = this;
   //map
-  self.Map = ko.observable(new Map(location));
+  self.address = ko.observable();
   self.updateMap = function (data, event) {
     if (event.which == 13 || event.which == 1) {
-      geocode(self.Map().address(), function(returned_latlng){
-        self.Map().googleMap.fitBounds(returned_latlng);
-        self.Map.location = returned_latlng;
-      })
+      geocode(self.address(), function(returned_latlng){
+        map.fitBounds(returned_latlng);
+        //self.Map.location = returned_latlng;
+      });
     }
     return true;
   };
   //nav behavior
+  self.navVisible = ko.observable(false);
   var nav_menu = $("#nav");
   var commute_form = $("#commute-form");
   self.toggleNav = function(){
-    nav_menu.toggleClass("open");
-  }
+    self.navVisible(!self.navVisible());  }
   self.hideNav = function(){
-    nav_menu.removeClass("open");
+    self.navVisible(false);
   }
   self.toggleCommute = function(){
     commute_form.toggleClass("open");
-    console.log(commute_form);
   }
-  setTimeout(function(){
-    var traveltime = new walkscore.TravelTime({
-    map    : self.Map().googleMap(),
-    mode   : walkscore.TravelTime.Mode.WALK,
-    time   : 10,
-    origin : '38.823888,-77.0471498',
-    color  : '#0000FF'
-    });
-    console.log(traveltime);
-    var bounds = new google.maps.LatLngBounds();
-    setTimeout(function(){
-      bounds = traveltime.getBounds();
-      console.log(bounds);
-      self.Map().googleMap().fitBounds(bounds);
-    }, 500)
-  },500);
 
+  var traveltime = new walkscore.TravelTime({
+  map    : map,
+  mode   : walkscore.TravelTime.Mode.WALK,
+  time   : 10,
+  origin : '38.823888,-77.0471498',
+  color  : '#0000FF'
+  });
+  var bounds = new google.maps.LatLngBounds();
+  traveltime.on('show', function(){
+    bounds = traveltime.getBounds();
+    map.fitBounds(bounds);
+  });
 }
 
 function setViewModel(location){
+  map = new google.maps.Map(document.getElementById('map'), {center: location, zoom: 12});
   viewModel = new ViewModel(location);
   ko.applyBindings(viewModel);
 };
 
-getUserLocation(setViewModel);
-
-// var map = new google.maps.Map(
-//   document.getElementById("map_container"),
-//   { mapTypeId: google.maps.MapTypeId.ROADMAP }
-// );
-// var traveltime = new walkscore.TravelTime({
-//   map    : map,
-//   mode   : walkscore.TravelTime.Mode.WALK,
-//   time   : 15,
-//   origin : '47.61460,-122.31704',
-//   color  : '#0000FF'
-// });
-// traveltime.on('show', function(){
-//   map.fitBounds(traveltime.getBounds());
-// });
+function initMap(){
+  geocoder = new google.maps.Geocoder();
+  getUserLocation(setViewModel);
+}
