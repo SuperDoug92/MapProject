@@ -28,7 +28,7 @@
         </div>
         <div class="row">
             <div class="input-group">
-              <input id = "input_location" type="text" class="form-control" data-bind="textInput: address, event: { keypress:updateMap}">
+              <input id = "input_location" type="text" class="form-control" data-bind="textInput:address, event: { keypress:updateMap}">
               <span class="input-group-btn">
                 <button id="submit_location" class="btn btn-default" type="button" data-bind="click: updateMap">Go!</button>
               </span>
@@ -37,22 +37,10 @@
         <div class = "row">
           <div class="btn-group-vertical btn-group-lg col-md-12 nav-button-group" role="group" aria-label="...">
             <button type="button" id="commute-button" class="btn btn-default col-md-12" data-bind="click:toggleCommute, clickBubble: false">Commute</button>
-            <div id="commute-form">
+            <div id="commute-form" data-bind="css: {open: commuteVisible}, foreach: commuteModes">
               <div class="input-group">
-                <span class="input-group-addon" id="basic-addon1">Drive</span>
-                <input type="text" class="form-control" placeholder="time(min)" aria-describedby="basic-addon1">
-              </div>
-              <div class="input-group">
-                <span class="input-group-addon" id="basic-addon1">Transit</span>
-                <input type="text" class="form-control" placeholder="time(min)" aria-describedby="basic-addon1">
-              </div>
-              <div class="input-group">
-                <span class="input-group-addon" id="basic-addon1">Walk</span>
-                <input type="text" class="form-control" placeholder="time(min)" aria-describedby="basic-addon1">
-              </div>
-              <div class="input-group">
-                <span class="input-group-addon" id="basic-addon1">Bike</span>
-                <input type="text" class="form-control" placeholder="time(min)" aria-describedby="basic-addon1">
+                <span class="input-group-addon" id="basic-addon1" data-bind="text: Mode"></span>
+                <input data-bind="text: Time" type="text" class="form-control" placeholder="time(min)" aria-describedby="basic-addon1">
               </div>
             </div>
             <button type="button" class="btn btn-default  col-md-12">Zillow</button>
@@ -70,9 +58,6 @@
   </script>
   <script type="text/javascript"
   src="//apicdn.walkscore.com/api/v1/traveltime/js?wsid=9ab7850bead42dcd96aed94d03ccd538">
-  </script>
-
-  <script async src="../js/main.js">
   </script>
 
 

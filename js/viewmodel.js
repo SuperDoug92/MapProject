@@ -1,5 +1,24 @@
 var latlng;
+var address;
 var map, geocoder;
+var viewModel;
+
+function initMap(){
+  geocoder = new google.maps.Geocoder();
+  getUserLocation(function(coordinates){
+    latlng = coordinates;
+    map = new google.maps.Map(document.getElementById('map'), {center: latlng, zoom: 12});
+    reverseGeocode(latlng,function(result){
+      address = result;
+      setViewModel();
+    });
+  });
+}
+
+function setViewModel(){
+  viewModel = new ViewModel();
+  ko.applyBindings(viewModel);
+};
 
 function getUserLocation(callback){
   var userLocation = {};
@@ -55,7 +74,8 @@ function reverseGeocode(latlng, callback){
             if(result[i].types[0]=="administrative_area_level_1"){components.push(result[i].long_name)}
             if(result[i].types[0]=="locality"){components.unshift(result[i].long_name)}
           }
-        callback(components.join(', '));
+          var address = components.join(', ')
+        callback(address);
       } else {
         window.alert('No results found');
       }
@@ -65,53 +85,78 @@ function reverseGeocode(latlng, callback){
   });
 }
 
-function ViewModel(location) {
+function ViewModel() {
   var self = this;
   //map
-  self.address = ko.observable();
+  self.latlng = ko.observable(latlng);
+  self.address = ko.observable(address);
   self.updateMap = function (data, event) {
     if (event.which == 13 || event.which == 1) {
       geocode(self.address(), function(returned_latlng){
         map.fitBounds(returned_latlng);
-        //self.Map.location = returned_latlng;
+        self.latlng(returned_latlng);
       });
     }
     return true;
   };
   //nav behavior
   self.navVisible = ko.observable(false);
-  var nav_menu = $("#nav");
-  var commute_form = $("#commute-form");
+  self.commuteVisible = ko.observable(false);
   self.toggleNav = function(){
     self.navVisible(!self.navVisible());  }
   self.hideNav = function(){
     self.navVisible(false);
   }
   self.toggleCommute = function(){
-    commute_form.toggleClass("open");
+    self.commuteVisible(!self.commuteVisible());
   }
 
-  var traveltime = new walkscore.TravelTime({
-  map    : map,
-  mode   : walkscore.TravelTime.Mode.WALK,
-  time   : 10,
-  origin : '38.823888,-77.0471498',
-  color  : '#0000FF'
-  });
+  self.commuteModes = ko.observableArray([
+    { Mode: 'Walk', Time: ko.observable(15)},
+    { Mode: 'Drive', Time: ko.observable(15)},
+    { Mode: 'Transit', Time: ko.observable(15)},
+    { Mode: 'Bike', Time: ko.observable(15)}
+  ]);
+
   var bounds = new google.maps.LatLngBounds();
-  traveltime.on('show', function(){
-    bounds = traveltime.getBounds();
-    map.fitBounds(bounds);
+  var traveltimes = [];
+  ko.utils.arrayForEach(self.commuteModes(),function(element, index){
+    if (typeof element.Time() != 'undefined'){
+      var mode;
+      switch(element.Mode) {
+        case 'Walk':
+            mode = walkscore.TravelTime.Mode.WALK;
+            break;
+        case 'Drive':
+            mode = walkscore.TravelTime.Mode.DRIVE;
+            break;
+        case 'Transit':
+            mode = walkscore.TravelTime.Mode.TRANSIT;
+            break;
+        case 'Bike':
+            mode = walkscore.TravelTime.Mode.BIKE;
+            break;
+      }
+      var origin = self.latlng().lat + "," + self.latlng().lng;
+      var traveltime = new walkscore.TravelTime({
+      map    : map,
+      mode   : mode,
+      time   : element.Time(),
+      origin : origin,
+      color  : '#0000FF'
+      });
+      traveltimes.push(traveltime);
+      setTimeout(function(){
+        // traveltime._mapView.ctx_.canvas.style.display = 'none'
+      },500);
+    }
   });
-}
 
-function setViewModel(location){
-  map = new google.maps.Map(document.getElementById('map'), {center: location, zoom: 12});
-  viewModel = new ViewModel(location);
-  ko.applyBindings(viewModel);
-};
+  setTimeout(function(){
+  traveltimes[3]._mapView.ctx_.canvas.style.display = 'none'
+  },500);
 
-function initMap(){
-  geocoder = new google.maps.Geocoder();
-  getUserLocation(setViewModel);
+  traveltimes[3].on('show', function(){
+    bounds.extend(traveltimes[3].getBounds());
+  });
 }
