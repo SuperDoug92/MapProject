@@ -112,10 +112,10 @@ function ViewModel() {
   }
 
   self.commuteModes = ko.observableArray([
-    { Mode: 'Walk', Time: ko.observable(15)},
+    { Mode: 'Walk', Time: ko.observable(5)},
     { Mode: 'Drive', Time: ko.observable()},
-    { Mode: 'Transit', Time: ko.observable(15)},
-    { Mode: 'Bike', Time: ko.observable(15)}
+    { Mode: 'Transit', Time: ko.observable(5)},
+    { Mode: 'Bike', Time: ko.observable(5)}
   ]);
 
   // self.commutModes[0].Time.subscribe(function(val){
@@ -158,15 +158,43 @@ function ViewModel() {
   });
 
   setTimeout(function(){
-    var ctx = traveltimes[0]._mapView.ctx_
+    // var ctx = traveltimes[0]._mapView.ctx_
+    // console.log(traveltimes[0]);
+    // ctx.globalCompositeOperation = 'source-in';
+    var polyCoords = [];
+    var polyPoint = function(lat,lng){
+      this.lat = lat;
+      this.lng = lng;
+    }
+    var count = 0;
+    traveltimes[0]._data.forEach(function(array,index){
+        polyCoords[index]=new polyPoint(array[0],array[1]);
+      })
+    console.log(traveltimes[0]);
+    var poly = new google.maps.Polygon({
+          paths: polyCoords,
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 3,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35
+        });
+        poly.setMap(map);
 
-    ctx.globalCompositeOperation = 'source-in';
-
+    // console.log(traveltimes[0]._data);
     traveltimes.forEach(function(traveltime, index){
-      if (index>0){
+      // if (index>0){
         traveltime.hide();
-        ctx.drawImage(traveltime._mapView.ctx_.canvas,0,0);
-      }
+        // new google.maps.Polygon({
+        //   paths: traveltime._data,
+        //   strokeColor: '#FF0000',
+        //   strokeOpacity: 0.8,
+        //   strokeWeight: 3,
+        //   fillColor: '#FF0000',
+        //   fillOpacity: 0.35
+        // });
+        // ctx.drawImage(traveltime._mapView.ctx_.canvas,0,0);
+      // }
       // traveltime.hide();
     })
   },1000);
