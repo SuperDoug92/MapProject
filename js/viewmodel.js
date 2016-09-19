@@ -168,9 +168,16 @@ function ViewModel() {
     }
     var count = 0;
     traveltimes[0]._data.forEach(function(array,index){
-        polyCoords[index]=new polyPoint(array[0],array[1]);
-      })
-    console.log(traveltimes[0]);
+      if (array[2]<=300){
+        polyCoords[count]=[array[0],array[1]];
+        // new polyPoint(array[0],array[1]);
+        count++
+      }
+    })
+    polyCoords = convexHull(polyCoords);
+    polyCoords.forEach(function(array, index){
+      polyCoords[index] = new polyPoint(array[0],array[1]);
+    })
     var poly = new google.maps.Polygon({
           paths: polyCoords,
           strokeColor: '#FF0000',
@@ -199,7 +206,40 @@ function ViewModel() {
     })
   },1000);
 
-  // traveltimes[3].on('show', function(){
-  //   bounds.extend(traveltimes[3].getBounds());
-  // });
+
+}
+
+
+//credit to: https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain for the below code
+function cross(o, a, b) {
+   return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+}
+
+// /**
+//  * @param points An array of [X, Y] coordinates
+//  */
+function convexHull(points) {
+   points.sort(function(a, b) {
+      return a[0] == b[0] ? a[1] - b[1] : a[0] - b[0];
+   });
+
+   var lower = [];
+   for (var i = 0; i < points.length; i++) {
+      while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], points[i]) <= 0) {
+         lower.pop();
+      }
+      lower.push(points[i]);
+   }
+
+   var upper = [];
+   for (var i = points.length - 1; i >= 0; i--) {
+      while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], points[i]) <= 0) {
+         upper.pop();
+      }
+      upper.push(points[i]);
+   }
+
+   upper.pop();
+   lower.pop();
+   return lower.concat(upper);
 }
