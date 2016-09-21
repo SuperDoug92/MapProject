@@ -112,10 +112,10 @@ function ViewModel() {
   }
 
   self.commuteModes = ko.observableArray([
-    { Mode: 'Walk', Time: ko.observable(5), Color:'#008744'},
-    { Mode: 'Drive', Time: ko.observable(5),Color:'#0057e7'},
-    { Mode: 'Transit', Time: ko.observable(15),Color:'#d62d20'},
-    { Mode: 'Bike', Time: ko.observable(5),Color:'#ffa700'}
+    { Mode: 'Walk', Time: ko.observable(), Color:'#008744'},
+    { Mode: 'Drive', Time: ko.observable(),Color:'#0057e7'},
+    { Mode: 'Transit', Time: ko.observable(),Color:'#d62d20'},
+    { Mode: 'Bike', Time: ko.observable(),Color:'#ffa700'}
   ]);
 
   // self.commutModes[0].Time.subscribe(function(val){
@@ -167,13 +167,12 @@ function ViewModel() {
       this.lat = lat;
       this.lng = lng;
     }
-    traveltimes.forEach(function(traveltime){
+    traveltimes.forEach(function(traveltime, index1){
       var count = 0;
       var polyCoords = [];
-      traveltime._data.forEach(function(array,index){
-        if (array[2]<=900){
+      traveltime._data.forEach(function(array,index2){
+        if (array[2]<=self.commuteModes()[index1].Time()*60){
           polyCoords[count]=[array[0],array[1]];
-          // new polyPoint(array[0],array[1]);
           count++
         }
       })
