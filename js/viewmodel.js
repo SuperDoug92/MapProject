@@ -112,10 +112,10 @@ function ViewModel() {
   }
 
   self.commuteModes = ko.observableArray([
-    { Mode: 'Walk', Time: ko.observable(5)},
-    { Mode: 'Drive', Time: ko.observable()},
-    { Mode: 'Transit', Time: ko.observable(5)},
-    { Mode: 'Bike', Time: ko.observable(5)}
+    { Mode: 'Walk', Time: ko.observable(5), Color:'#008744'},
+    { Mode: 'Drive', Time: ko.observable(5),Color:'#0057e7'},
+    { Mode: 'Transit', Time: ko.observable(15),Color:'#d62d20'},
+    { Mode: 'Bike', Time: ko.observable(5),Color:'#ffa700'}
   ]);
 
   // self.commutModes[0].Time.subscribe(function(val){
@@ -148,7 +148,7 @@ function ViewModel() {
       mode   : mode,
       time   : element.Time(),
       origin : origin,
-      color  : '#0000FF',
+      color  : element.Color,
       });
       traveltime.hide = function(){
         this._mapView.ctx_.canvas.style.display = 'none';
@@ -156,57 +156,44 @@ function ViewModel() {
       traveltimes.push(traveltime);
     }
   });
+  var polygons = [];
 
   setTimeout(function(){
-    // var ctx = traveltimes[0]._mapView.ctx_
-    // console.log(traveltimes[0]);
-    // ctx.globalCompositeOperation = 'source-in';
+    traveltimes.forEach(function(traveltime, index){
+        traveltime.hide();
+    })
     var polyCoords = [];
     var polyPoint = function(lat,lng){
       this.lat = lat;
       this.lng = lng;
     }
-    var count = 0;
-    traveltimes[0]._data.forEach(function(array,index){
-      if (array[2]<=300){
-        polyCoords[count]=[array[0],array[1]];
-        // new polyPoint(array[0],array[1]);
-        count++
-      }
+    traveltimes.forEach(function(traveltime){
+      var count = 0;
+      var polyCoords = [];
+      traveltime._data.forEach(function(array,index){
+        if (array[2]<=900){
+          polyCoords[count]=[array[0],array[1]];
+          // new polyPoint(array[0],array[1]);
+          count++
+        }
+      })
+      polyCoords = convexHull(polyCoords);
+      polyCoords.forEach(function(array, index){
+        polyCoords[index] = new polyPoint(array[0],array[1]);
+      })
+      polygons.push(new google.maps.Polygon({
+        paths: polyCoords,
+        strokeColor: self.commuteModes()[polygons.length].Color,
+        strokeOpacity: 0.8,
+        strokeWeight: 3,
+        fillColor: '',
+        fillOpacity: 0.0
+      }));
     })
-    polyCoords = convexHull(polyCoords);
-    polyCoords.forEach(function(array, index){
-      polyCoords[index] = new polyPoint(array[0],array[1]);
-    })
-    var poly = new google.maps.Polygon({
-          paths: polyCoords,
-          strokeColor: '#FF0000',
-          strokeOpacity: 0.8,
-          strokeWeight: 3,
-          fillColor: '#FF0000',
-          fillOpacity: 0.35
-        });
-        poly.setMap(map);
-
-    // console.log(traveltimes[0]._data);
-    traveltimes.forEach(function(traveltime, index){
-      // if (index>0){
-        traveltime.hide();
-        // new google.maps.Polygon({
-        //   paths: traveltime._data,
-        //   strokeColor: '#FF0000',
-        //   strokeOpacity: 0.8,
-        //   strokeWeight: 3,
-        //   fillColor: '#FF0000',
-        //   fillOpacity: 0.35
-        // });
-        // ctx.drawImage(traveltime._mapView.ctx_.canvas,0,0);
-      // }
-      // traveltime.hide();
+    polygons.forEach(function(poly){
+      poly.setMap(map);
     })
   },1000);
-
-
 }
 
 

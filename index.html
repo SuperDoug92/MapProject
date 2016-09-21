@@ -39,7 +39,7 @@
             <button type="button" id="commute-button" class="btn btn-default col-md-12" data-bind="click:toggleCommute, clickBubble: false">Commute</button>
             <div id="commute-form" data-bind="css: {open: commuteVisible}, foreach: commuteModes">
               <div class="input-group">
-                <span class="input-group-addon" id="basic-addon1" data-bind="text: Mode"></span>
+                <span class="input-group-addon" id="basic-addon1" data-bind="text: Mode, style: { color: Color}"></span>
                 <input data-bind="text: Time" type="text" class="form-control" placeholder="time(min)" aria-describedby="basic-addon1">
               </div>
             </div>
