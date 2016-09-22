@@ -2,6 +2,10 @@ var latlng;
 var address;
 var map, geocoder;
 var viewModel;
+var polyPoint = function(lat,lng){
+  this.lat = lat;
+  this.lng = lng;
+}
 
 function initMap(){
   geocoder = new google.maps.Geocoder();
@@ -111,86 +115,80 @@ function ViewModel() {
     self.commuteVisible(!self.commuteVisible());
   }
 
-  self.commuteModes = ko.observableArray([
-    { Mode: 'Walk', Time: ko.observable(), Color:'#008744'},
-    { Mode: 'Drive', Time: ko.observable(),Color:'#0057e7'},
-    { Mode: 'Transit', Time: ko.observable(),Color:'#d62d20'},
-    { Mode: 'Bike', Time: ko.observable(),Color:'#ffa700'}
-  ]);
+  var commuteMode = function(Mode, Time, Color){
+    this.Mode = Mode;
+    this.Time = Time;
+    this.Color = Color;
 
-  // self.commutModes[0].Time.subscribe(function(val){
-  //   resetTravelTime(0);
-  // })
+  }
+
+  self.commuteModes = ko.observableArray([new commuteMode('Walk', ko.observable(15),'#008744'),
+    new commuteMode('Drive', ko.observable(15),'#0057e7'),
+    new commuteMode('Transit', ko.observable(15),'#d62d20'),
+    new commuteMode('Bike', ko.observable(15),'#ffa700')
+  ]);
 
   var bounds = new google.maps.LatLngBounds();
 
   var traveltimes = [];
   ko.utils.arrayForEach(self.commuteModes(),function(element, index){
-    if (typeof element.Time() != 'undefined'){
-      var mode;
       switch(element.Mode) {
         case 'Walk':
-            mode = walkscore.TravelTime.Mode.WALK;
+            element.ttmode = walkscore.TravelTime.Mode.WALK;
             break;
         case 'Drive':
-            mode = walkscore.TravelTime.Mode.DRIVE;
+            element.ttmode = walkscore.TravelTime.Mode.DRIVE;
             break;
         case 'Transit':
-            mode = walkscore.TravelTime.Mode.TRANSIT;
+            element.ttmode = walkscore.TravelTime.Mode.TRANSIT;
             break;
         case 'Bike':
-            mode = walkscore.TravelTime.Mode.BIKE;
+            element.ttmode = walkscore.TravelTime.Mode.BIKE;
             break;
-      }
+        }
       var origin = self.latlng().lat + "," + self.latlng().lng;
-      var traveltime = new walkscore.TravelTime({
-      map    : map,
-      mode   : mode,
-      time   : element.Time(),
-      origin : origin,
-      color  : element.Color,
-      });
-      traveltime.hide = function(){
-        this._mapView.ctx_.canvas.style.display = 'none';
+      if (typeof element.Time() != 'undefined'){
+        var traveltime = new walkscore.TravelTime({
+        map    : map,
+        mode   : element.ttmode,
+        time   : element.Time(),
+        origin : origin,
+        color  : element.Color,
+        });
+        traveltime.hide = function(){
+          this._mapView.ctx_.canvas.style.display = 'none';
+        }
+        traveltime.on('show', function(data){
+          var polyCoords = [];
+          var count = 0;
+          traveltime._data.forEach(function(array,index2){
+            if (array[2]<=element.Time()*60){
+              polyCoords[count]=[array[0],array[1]];
+              count++
+            }
+          })
+          polyCoords = convexHull(polyCoords);
+          polyCoords.forEach(function(array, index){
+            polyCoords[index] = new polyPoint(array[0],array[1]);
+          })
+          element.polygon = new google.maps.Polygon({
+            paths: polyCoords,
+            strokeColor: element.Color,
+            strokeOpacity: 0.8,
+            strokeWeight: 3,
+            fillColor: '',
+            fillOpacity: 0.0
+          });
+          element.polygon.setMap(map);
+
+        })
+        traveltimes.push(traveltime);
       }
-      traveltimes.push(traveltime);
-    }
   });
-  var polygons = [];
 
   setTimeout(function(){
     traveltimes.forEach(function(traveltime, index){
         traveltime.hide();
-    })
-    var polyCoords = [];
-    var polyPoint = function(lat,lng){
-      this.lat = lat;
-      this.lng = lng;
-    }
-    traveltimes.forEach(function(traveltime, index1){
-      var count = 0;
-      var polyCoords = [];
-      traveltime._data.forEach(function(array,index2){
-        if (array[2]<=self.commuteModes()[index1].Time()*60){
-          polyCoords[count]=[array[0],array[1]];
-          count++
-        }
-      })
-      polyCoords = convexHull(polyCoords);
-      polyCoords.forEach(function(array, index){
-        polyCoords[index] = new polyPoint(array[0],array[1]);
-      })
-      polygons.push(new google.maps.Polygon({
-        paths: polyCoords,
-        strokeColor: self.commuteModes()[polygons.length].Color,
-        strokeOpacity: 0.8,
-        strokeWeight: 3,
-        fillColor: '',
-        fillOpacity: 0.0
-      }));
-    })
-    polygons.forEach(function(poly){
-      poly.setMap(map);
     })
   },1000);
 }
