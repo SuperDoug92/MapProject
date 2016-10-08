@@ -114,18 +114,17 @@ function ViewModel() {
   self.toggleCommute = function(){
     self.commuteVisible(!self.commuteVisible());
   }
-
-  var commuteMode = function(Mode, Time, Color){
+  //polygons
+    var commuteMode = function(Mode, Time, Color){
     this.Mode = Mode;
-    this.Time = Time;
+    this.Time = ko.observable(Time);
     this.Color = Color;
-
   }
 
-  self.commuteModes = ko.observableArray([new commuteMode('Walk', ko.observable(15),'#008744'),
-    new commuteMode('Drive', ko.observable(15),'#0057e7'),
-    new commuteMode('Transit', ko.observable(15),'#d62d20'),
-    new commuteMode('Bike', ko.observable(15),'#ffa700')
+  self.commuteModes = ko.observableArray([new commuteMode('Walk', 15,'#008744'),
+    new commuteMode('Drive', 15,'#0057e7'),
+    new commuteMode('Transit', 15,'#d62d20'),
+    new commuteMode('Bike', 15,'#ffa700')
   ]);
 
   var bounds = new google.maps.LatLngBounds();
@@ -146,43 +145,10 @@ function ViewModel() {
             element.ttmode = walkscore.TravelTime.Mode.BIKE;
             break;
         }
-      var origin = self.latlng().lat + "," + self.latlng().lng;
+      origin = self.latlng().lat + "," + self.latlng().lng;
       if (typeof element.Time() != 'undefined'){
-        var traveltime = new walkscore.TravelTime({
-        map    : map,
-        mode   : element.ttmode,
-        time   : element.Time(),
-        origin : origin,
-        color  : element.Color,
-        });
-        traveltime.hide = function(){
-          this._mapView.ctx_.canvas.style.display = 'none';
-        }
-        traveltime.on('show', function(data){
-          var polyCoords = [];
-          var count = 0;
-          traveltime._data.forEach(function(array,index2){
-            if (array[2]<=element.Time()*60){
-              polyCoords[count]=[array[0],array[1]];
-              count++
-            }
-          })
-          polyCoords = convexHull(polyCoords);
-          polyCoords.forEach(function(array, index){
-            polyCoords[index] = new polyPoint(array[0],array[1]);
-          })
-          element.polygon = new google.maps.Polygon({
-            paths: polyCoords,
-            strokeColor: element.Color,
-            strokeOpacity: 0.8,
-            strokeWeight: 3,
-            fillColor: '',
-            fillOpacity: 0.0
-          });
-          element.polygon.setMap(map);
-
-        })
-        traveltimes.push(traveltime);
+        element.traveltime = CreateTravelTime(element, origin);
+        traveltimes.push(element.traveltime);
       }
   });
 
@@ -190,9 +156,55 @@ function ViewModel() {
     traveltimes.forEach(function(traveltime, index){
         traveltime.hide();
     })
-  },1000);
+  },2000);
+
+  self.updatePolygon = function(commuteMode){
+    commuteMode.polygon.setMap(null);
+    if (commuteMode.Time()>0){
+      commuteMode.traveltime = CreateTravelTime(commuteMode,origin);
+    }
+    setTimeout(function(){
+      commuteMode.traveltime.hide();
+    },2000);
+  }
 }
 
+function CreateTravelTime(element, origin){
+  var traveltime = new walkscore.TravelTime({
+  map    : map,
+  mode   : element.ttmode,
+  time   : element.Time(),
+  origin : origin,
+  color  : element.Color,
+  });
+  traveltime.hide = function(){
+    this._mapView.ctx_.canvas.style.display = 'none';
+  }
+  traveltime.on('show', function(data){
+    var polyCoords = [];
+    var count = 0;
+    element.traveltime._data.forEach(function(array,index2){
+      if (array[2]<=element.Time()*60){
+        polyCoords[count]=[array[0],array[1]];
+        count++
+      }
+    })
+    polyCoords = convexHull(polyCoords);
+    polyCoords.forEach(function(array, index){
+      polyCoords[index] = new polyPoint(array[0],array[1]);
+    })
+    element.polygon = new google.maps.Polygon({
+      paths: polyCoords,
+      strokeColor: element.Color,
+      strokeOpacity: 0.8,
+      strokeWeight: 3,
+      fillColor: '',
+      fillOpacity: 0.0
+    });
+    element.polygon.setMap(map);
+  })
+  return traveltime;
+}
 
 //credit to: https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain for the below code
 function cross(o, a, b) {
