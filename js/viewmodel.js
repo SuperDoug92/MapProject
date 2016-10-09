@@ -2,6 +2,11 @@ var latlng;
 var address;
 var map, geocoder;
 var viewModel;
+var YELP_KEY = 'lnYOeUs2e1T9RpBjImW6cw'
+var YELP_TOKEN =  'IshXlTYUzLRzkkBsUSllI2Gl8CxNUbtRAM3X6auylong0D9eQdrONuci7xli9Uzs'
+var YELP_BASE_URL = 'https://api.yelp.com/v3/businesses/search'
+
+
 var polyPoint = function(lat,lng){
   this.lat = lat;
   this.lng = lng;
@@ -167,6 +172,7 @@ function ViewModel() {
       commuteMode.traveltime.hide();
     },2000);
   }
+
 }
 
 function CreateTravelTime(element, origin){
@@ -204,6 +210,43 @@ function CreateTravelTime(element, origin){
     element.polygon.setMap(map);
   })
   return traveltime;
+}
+
+function GetYelpData(category){
+  function nonce_generate() {
+    return (Math.floor(Math.random() * 1e12).toString());
+  }
+
+  var yelp_url = YELP_BASE_URL
+
+    var parameters = {
+      oauth_consumer_key: YELP_KEY,
+      oauth_token: YELP_TOKEN,
+      oauth_nonce: nonce_generate(),
+      oauth_timestamp: Math.floor(Date.now()/1000),
+      oauth_signature_method: 'HMAC-SHA1',
+      oauth_version : '1.0',
+      callback: 'cb'              // This is crucial to include for jsonp implementation in AJAX or else the oauth-signature will be wrong.
+    };
+
+    var encodedSignature = oauthSignature.generate('GET',yelp_url, parameters, YELP_KEY, YELP_TOKEN);
+    parameters.oauth_signature = encodedSignature;
+
+    var settings = {
+      url: yelp_url,
+      data: parameters,
+      cache: true,                // This is crucial to include as well to prevent jQuery from adding on a cache-buster parameter "_=23489489749837", invalidating our oauth-signature
+      dataType: 'jsonp',
+      success: function(results) {
+        console.log(results);
+      },
+      fail: function() {
+        console.log(err);
+      }
+    };
+
+    // Send AJAX query via jQuery library.
+    $.ajax(settings);
 }
 
 //credit to: https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain for the below code

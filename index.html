@@ -8,9 +8,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/js/bootstrap.min.js" integrity="sha384-ux8v3A6CPtOTqOzMKiuo3d/DomGaaClxFYdCu2HPMBEkf6x2xiDyJ7gkXU0MWwaD" crossorigin="anonymous"></script>
-
+    <script src="/bower_components/oauth-signature/dist/oauth-signature.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/styles.css">
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js"></script>
   </head>
   <body>
@@ -43,7 +42,7 @@
                 <input data-bind="value: Time, event:{change:$parent.updatePolygon}" type="text" class="form-control" placeholder="time(min)" aria-describedby="basic-addon1">
               </div>
             </div>
-            <button type="button" class="btn btn-default  col-md-12">Zillow</button>
+            <button type="button" class="btn btn-default  col-md-12">FourSquare</button>
           </div>
         </div>
       </nav>
