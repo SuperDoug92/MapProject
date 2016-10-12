@@ -2,9 +2,7 @@ var latlng;
 var address;
 var map, geocoder;
 var viewModel;
-var YELP_KEY = 'lnYOeUs2e1T9RpBjImW6cw'
-var YELP_TOKEN =  'IshXlTYUzLRzkkBsUSllI2Gl8CxNUbtRAM3X6auylong0D9eQdrONuci7xli9Uzs'
-var YELP_BASE_URL = 'https://api.yelp.com/v3/businesses/search'
+var YELP_BASE_URL = 'https://api.yelp.com/v2/search/?'
 
 
 var polyPoint = function(lat,lng){
@@ -94,6 +92,8 @@ function reverseGeocode(latlng, callback){
   });
 }
 
+
+
 function ViewModel() {
   var self = this;
   //map
@@ -111,6 +111,8 @@ function ViewModel() {
   //nav behavior
   self.navVisible = ko.observable(false);
   self.commuteVisible = ko.observable(false);
+  self.foursquareVisible = ko.observable(false);
+
   self.toggleNav = function(){
     self.navVisible(!self.navVisible());  }
   self.hideNav = function(){
@@ -118,6 +120,9 @@ function ViewModel() {
   }
   self.toggleCommute = function(){
     self.commuteVisible(!self.commuteVisible());
+  }
+  self.togglefoursquare = function(){
+    self.foursquareVisible(!self.foursquareVisible());
   }
   //polygons
     var commuteMode = function(Mode, Time, Color){
@@ -127,9 +132,9 @@ function ViewModel() {
   }
 
   self.commuteModes = ko.observableArray([new commuteMode('Walk', 15,'#008744'),
-    new commuteMode('Drive', 15,'#0057e7'),
-    new commuteMode('Transit', 15,'#d62d20'),
-    new commuteMode('Bike', 15,'#ffa700')
+    new commuteMode('Drive',undefined,'#0057e7'),
+    new commuteMode('Transit', undefined,'#d62d20'),
+    new commuteMode('Bike', undefined,'#ffa700')
   ]);
 
   var bounds = new google.maps.LatLngBounds();
@@ -173,6 +178,21 @@ function ViewModel() {
     },2000);
   }
 
+  self.filter = ko.observable("")
+  self.foursquare = {};
+
+
+  //foursquare
+  self.filteredItems = ko.computed(function() {
+    var filter = self.filter().toLowerCase();
+    if (!filter) {
+        return ""//categories.map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
+    } else {
+        return ko.utils.arrayFilter(categories, function(item) {
+          return stringStartsWith(item.title.toLowerCase(), filter);
+        }).map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
+    }
+  });
 }
 
 function CreateTravelTime(element, origin){
@@ -212,16 +232,19 @@ function CreateTravelTime(element, origin){
   return traveltime;
 }
 
-function GetYelpData(category){
+GetYelpData('coffee','Alexandria,VA');
+
+function GetYelpData(category, address){
   function nonce_generate() {
     return (Math.floor(Math.random() * 1e12).toString());
   }
 
   var yelp_url = YELP_BASE_URL
-
     var parameters = {
-      oauth_consumer_key: YELP_KEY,
-      oauth_token: YELP_TOKEN,
+      location: address,
+      category_filter: category,
+      oauth_consumer_key: Consumer_Key,
+      oauth_token: Token,
       oauth_nonce: nonce_generate(),
       oauth_timestamp: Math.floor(Date.now()/1000),
       oauth_signature_method: 'HMAC-SHA1',
@@ -229,7 +252,7 @@ function GetYelpData(category){
       callback: 'cb'              // This is crucial to include for jsonp implementation in AJAX or else the oauth-signature will be wrong.
     };
 
-    var encodedSignature = oauthSignature.generate('GET',yelp_url, parameters, YELP_KEY, YELP_TOKEN);
+    var encodedSignature = oauthSignature.generate('GET',yelp_url, parameters, Consumer_Secret, Token_Secret);
     parameters.oauth_signature = encodedSignature;
 
     var settings = {
@@ -238,10 +261,8 @@ function GetYelpData(category){
       cache: true,                // This is crucial to include as well to prevent jQuery from adding on a cache-buster parameter "_=23489489749837", invalidating our oauth-signature
       dataType: 'jsonp',
       success: function(results) {
-        console.log(results);
       },
       fail: function() {
-        console.log(err);
       }
     };
 
@@ -282,3 +303,10 @@ function convexHull(points) {
    lower.pop();
    return lower.concat(upper);
 }
+
+var stringStartsWith = function (string, startsWith) {
+    string = string || "";
+    if (startsWith.length > string.length)
+        return false;
+    return string.substring(0, startsWith.length) === startsWith;
+};
