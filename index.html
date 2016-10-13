@@ -47,10 +47,11 @@
             <div id="slider-form" data-bind="css: {open: foursquareVisible}">
               <div class="input-group">
                 <span class="input-group-addon" id="basic-addon1" data-bind="">Category</span>
-                <input data-bind="textInput: filter" type="text" class="form-control" placeholder="select a category" aria-describedby="basic-addon1">
-              </div>
-              <div data-bind="foreach: filteredItems">
-                <div data-bind="text:$data"></div>
+                <input list="browsers" data-bind="textInput: filter" type="text" class="form-control" placeholder="select a category" aria-describedby="basic-addon1">
+                <datalist id="browsers" data-bind="foreach: filteredItems">
+                  <div>poop</div>
+                  <option data-bind="value:$data"></option>
+                </datalist>
               </div>
             </div>
           </div>

@@ -162,20 +162,34 @@ function ViewModel() {
       }
   });
 
-  setTimeout(function(){
+  setInterval(function(){
     traveltimes.forEach(function(traveltime, index){
-        traveltime.hide();
+      if(typeof traveltime._mapView !== "undefined"){
+        if(typeof traveltime._mapView.ctx_ !== "undefined"){
+          if(typeof traveltime._mapView.ctx_.canvas !== "undefined"){
+            traveltime.hide();
+          }
+        }
+      }
     })
-  },2000);
+  },20);
 
   self.updatePolygon = function(commuteMode){
-    commuteMode.polygon.setMap(null);
+    if (commuteMode.polygon){
+      commuteMode.polygon.setMap(null)
+    }
     if (commuteMode.Time()>0){
       commuteMode.traveltime = CreateTravelTime(commuteMode,origin);
     }
-    setTimeout(function(){
-      commuteMode.traveltime.hide();
-    },2000);
+    setInterval(function(){
+      if(typeof commuteMode.traveltime._mapView !== "undefined"){
+        if(typeof commuteMode.traveltime._mapView.ctx_ !== "undefined"){
+          if(typeof commuteMode.traveltime._mapView.ctx_.canvas !== "undefined"){
+            commuteMode.traveltime.hide();
+          }
+        }
+      }
+    },20);
   }
 
   self.filter = ko.observable("")
@@ -191,9 +205,10 @@ function ViewModel() {
         return ko.utils.arrayFilter(categories, function(item) {
           return stringStartsWith(item.title.toLowerCase(), filter);
         }).map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
-    }
-  });
-}
+      }
+    });
+  }
+  console.log(self.filteredItems);
 
 function CreateTravelTime(element, origin){
   var traveltime = new walkscore.TravelTime({
