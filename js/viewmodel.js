@@ -1,3 +1,4 @@
+
 var latlng;
 var address;
 var map, geocoder;
@@ -131,7 +132,7 @@ function ViewModel() {
     this.Color = Color;
   }
 
-  self.commuteModes = ko.observableArray([new commuteMode('Walk', 15,'#008744'),
+  self.commuteModes = ko.observableArray([new commuteMode('Walk', undefined,'#008744'),
     new commuteMode('Drive',undefined,'#0057e7'),
     new commuteMode('Transit', undefined,'#d62d20'),
     new commuteMode('Bike', undefined,'#ffa700')
@@ -200,13 +201,13 @@ function ViewModel() {
   self.filteredItems = ko.computed(function() {
     var filter = self.filter().toLowerCase();
     if (!filter) {
-        return ""//categories.map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
+        return categories.map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
     } else {
         return ko.utils.arrayFilter(categories, function(item) {
           return stringStartsWith(item.title.toLowerCase(), filter);
         }).map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
       }
-    });
+    }).extend({ notify: 'always' });
   }
   console.log(self.filteredItems);
 
