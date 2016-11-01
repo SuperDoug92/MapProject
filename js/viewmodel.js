@@ -194,23 +194,44 @@ function ViewModel() {
     },20);
   }
 
-  self.filter = ko.observable("")
-  self.foursquare = {};
+  //yelp
+  self.DisplayYelpResults = function(results){
+    yelpResults = results.businesses.map(function(obj){
+      var nObj = {}
+      nObj.location = {};
+      nObj.location.lat = obj.location.coordinate.latitude;
+      nObj.location.lng = obj.location.coordinate.longitude;
+      nObj.name = obj.name;
+      nObj.display = false;
+      return nObj
+    });
 
-
-  //foursquare
-  self.filteredItems = ko.computed(function() {
-    var filter = self.filter().toLowerCase();
-    if (!filter) {
-        return categories.map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
-    } else {
-        return ko.utils.arrayFilter(categories, function(item) {
-          return stringStartsWith(item.title.toLowerCase(), filter);
-        }).map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
+    self.commuteModes.forEach(function(commuteMode){
+      if (commuteMode.polygon){
+        yelpResults.forEach(function(result){
+          if (google.maps.geometry.poly.containsLocation(result.location, commuteMode.polygon)){
+            result.display = true;
+          }
+        })
       }
-    }).extend({ notify: 'always' });
+    })
   }
-  console.log(self.filteredItems);
+  // self.filter = ko.observable("")
+  // self.foursquare = {};
+  //
+  //
+  // //foursquare
+  // self.filteredItems = ko.computed(function() {
+  //   var filter = self.filter().toLowerCase();
+  //   if (!filter) {
+  //       return categories.map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
+  //   } else {
+  //       return ko.utils.arrayFilter(categories, function(item) {
+  //         return stringStartsWith(item.title.toLowerCase(), filter);
+  //       }).map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
+  //     }
+  //   }).extend({ notify: 'always' });
+  }
 
 function CreateTravelTime(element, origin){
   var traveltime = new walkscore.TravelTime({
@@ -249,7 +270,9 @@ function CreateTravelTime(element, origin){
   return traveltime;
 }
 
-console.log(GetYelpData('coffee','Alexandria,VA'));
+GetYelpData('coffee','Alexandria,VA');
+
+var yelpResults;
 
 function GetYelpData(category, address){
   function nonce_generate() {
@@ -278,6 +301,7 @@ function GetYelpData(category, address){
       cache: true,                // This is crucial to include as well to prevent jQuery from adding on a cache-buster parameter "_=23489489749837", invalidating our oauth-signature
       dataType: 'jsonp',
       success: function(results) {
+        viewModel.DisplayYelpResults(results);
       },
       fail: function() {
       }
@@ -286,6 +310,14 @@ function GetYelpData(category, address){
     // Send AJAX query via jQuery library.
     $.ajax(settings);
 }
+
+
+
+
+
+
+
+
 
 //credit to: https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain for the below code
 function cross(o, a, b) {
