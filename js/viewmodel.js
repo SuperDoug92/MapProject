@@ -5,7 +5,6 @@ var map, geocoder;
 var viewModel;
 var YELP_BASE_URL = 'https://api.yelp.com/v2/search/?'
 
-
 var polyPoint = function(lat,lng){
   this.lat = lat;
   this.lng = lng;
@@ -163,12 +162,13 @@ function ViewModel() {
       }
   });
 
-  setInterval(function(){
+  var hideCtx = setInterval(function(){
     traveltimes.forEach(function(traveltime, index){
       if(typeof traveltime._mapView !== "undefined"){
         if(typeof traveltime._mapView.ctx_ !== "undefined"){
           if(typeof traveltime._mapView.ctx_.canvas !== "undefined"){
             traveltime.hide();
+            clearInterval(hideCtx);
           }
         }
       }
@@ -182,11 +182,12 @@ function ViewModel() {
     if (commuteMode.Time()>0){
       commuteMode.traveltime = CreateTravelTime(commuteMode,origin);
     }
-    setInterval(function(){
+    var hideUpdateCtx = setInterval(function(){
       if(typeof commuteMode.traveltime._mapView !== "undefined"){
         if(typeof commuteMode.traveltime._mapView.ctx_ !== "undefined"){
           if(typeof commuteMode.traveltime._mapView.ctx_.canvas !== "undefined"){
             commuteMode.traveltime.hide();
+            clearInterval(hideUpdateCtx);
           }
         }
       }
@@ -248,7 +249,7 @@ function CreateTravelTime(element, origin){
   return traveltime;
 }
 
-GetYelpData('coffee','Alexandria,VA');
+console.log(GetYelpData('coffee','Alexandria,VA'));
 
 function GetYelpData(category, address){
   function nonce_generate() {
