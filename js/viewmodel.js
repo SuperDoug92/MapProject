@@ -275,8 +275,10 @@ function ViewModel() {
   self.filteredItems = ko.computed(function() {
     var filter = self.filter().toLowerCase();
     if (!filter) {
+        //return top 3 results from entire list in the format "parentCategory > category"
         return categories.map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
     } else {
+      //return top 3 results which match the entered text in the format parentCategory > category"
         return ko.utils.arrayFilter(categories, function(item) {
           return stringStartsWith(item.title.toLowerCase(), filter);
         }).map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
