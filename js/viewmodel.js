@@ -92,6 +92,79 @@ function reverseGeocode(latlng, callback){
   });
 }
 
+function CreateTravelTime(element, origin){
+  var traveltime = new walkscore.TravelTime({
+  map    : map,
+  mode   : element.ttmode,
+  time   : element.Time(),
+  origin : origin,
+  color  : element.Color,
+  });
+  traveltime.hide = function(){
+    this._mapView.ctx_.canvas.style.display = 'none';
+  }
+  traveltime.on('show', function(data){
+    var polyCoords = [];
+    var count = 0;
+    element.traveltime._data.forEach(function(array,index2){
+      if (array[2]<=element.Time()*60){
+        polyCoords[count]=[array[0],array[1]];
+        count++
+      }
+    })
+    polyCoords = convexHull(polyCoords);
+    polyCoords.forEach(function(array, index){
+      polyCoords[index] = new polyPoint(array[0],array[1]);
+    })
+    element.polygon = new google.maps.Polygon({
+      paths: polyCoords,
+      strokeColor: element.Color,
+      strokeOpacity: 0.8,
+      strokeWeight: 3,
+      fillColor: '',
+      fillOpacity: 0.0
+    });
+    element.polygon.setMap(map);
+  })
+  return traveltime;
+}
+
+function GetYelpData(category, address){
+  function nonce_generate() {
+    return (Math.floor(Math.random() * 1e12).toString());
+  }
+
+  var yelp_url = YELP_BASE_URL
+    var parameters = {
+      location: address,
+      category_filter: category,
+      oauth_consumer_key: Consumer_Key,
+      oauth_token: Token,
+      oauth_nonce: nonce_generate(),
+      oauth_timestamp: Math.floor(Date.now()/1000),
+      oauth_signature_method: 'HMAC-SHA1',
+      oauth_version : '1.0',
+      callback: 'cb'              // This is crucial to include for jsonp implementation in AJAX or else the oauth-signature will be wrong.
+    };
+
+    var encodedSignature = oauthSignature.generate('GET',yelp_url, parameters, Consumer_Secret, Token_Secret);
+    parameters.oauth_signature = encodedSignature;
+
+    var settings = {
+      url: yelp_url,
+      data: parameters,
+      cache: true,                // This is crucial to include as well to prevent jQuery from adding on a cache-buster parameter "_=23489489749837", invalidating our oauth-signature
+      dataType: 'jsonp',
+      success: function(results) {
+        viewModel.DisplayYelpResults(results);
+      },
+      fail: function() {
+      }
+    };
+
+    // Send AJAX query via jQuery library.
+    $.ajax(settings);
+}
 
 
 function ViewModel() {
@@ -132,8 +205,8 @@ function ViewModel() {
   }
 
   self.commuteModes = ko.observableArray([new commuteMode('Walk', undefined,'#008744'),
-    new commuteMode('Drive',undefined,'#0057e7'),
-    new commuteMode('Transit', undefined,'#d62d20'),
+    new commuteMode('Drive',5,'#0057e7'),
+    new commuteMode('Transit', 6,'#d62d20'),
     new commuteMode('Bike', undefined,'#ffa700')
   ]);
 
@@ -173,7 +246,7 @@ function ViewModel() {
         }
       }
     })
-  },20);
+  },10);
 
   self.updatePolygon = function(commuteMode){
     if (commuteMode.polygon){
@@ -181,6 +254,7 @@ function ViewModel() {
     }
     if (commuteMode.Time()>0){
       commuteMode.traveltime = CreateTravelTime(commuteMode,origin);
+      self.updateYelp(commuteMode);
     }
     var hideUpdateCtx = setInterval(function(){
       if(typeof commuteMode.traveltime._mapView !== "undefined"){
@@ -191,10 +265,25 @@ function ViewModel() {
           }
         }
       }
-    },20);
+    },10);
   }
+  var noPolygon;
+  var markers = [];
 
-  //yelp
+  //yelp category filter
+  self.filter = ko.observable("")
+  self.filteredItems = ko.computed(function() {
+    var filter = self.filter().toLowerCase();
+    if (!filter) {
+        return categories.map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
+    } else {
+        return ko.utils.arrayFilter(categories, function(item) {
+          return stringStartsWith(item.title.toLowerCase(), filter);
+        }).map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
+      }
+    }).extend({ notify: 'always' });
+
+  //yelp data
   self.DisplayYelpResults = function(results){
     yelpResults = results.businesses.map(function(obj){
       var nObj = {}
@@ -206,117 +295,26 @@ function ViewModel() {
       return nObj
     });
 
-    self.commuteModes.forEach(function(commuteMode){
+    self.commuteModes().forEach(function(commuteMode){
       if (commuteMode.polygon){
+        noPolygon = false;
         yelpResults.forEach(function(result){
-          if (google.maps.geometry.poly.containsLocation(result.location, commuteMode.polygon)){
+          var googleLatLng =  new google.maps.LatLng(result.location);
+          if (google.maps.geometry.poly.containsLocation(googleLatLng, commuteMode.polygon)){
             result.display = true;
+            markers.push(new google.maps.Marker({
+              position: googleLatLng,
+              map: map,
+              animation: google.maps.Animation.DROP,
+              title: result.name
+            }));
           }
         })
       }
     })
   }
-  // self.filter = ko.observable("")
-  // self.foursquare = {};
-  //
-  //
-  // //foursquare
-  // self.filteredItems = ko.computed(function() {
-  //   var filter = self.filter().toLowerCase();
-  //   if (!filter) {
-  //       return categories.map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
-  //   } else {
-  //       return ko.utils.arrayFilter(categories, function(item) {
-  //         return stringStartsWith(item.title.toLowerCase(), filter);
-  //       }).map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
-  //     }
-  //   }).extend({ notify: 'always' });
+    GetYelpData('coffee', self.address());
   }
-
-function CreateTravelTime(element, origin){
-  var traveltime = new walkscore.TravelTime({
-  map    : map,
-  mode   : element.ttmode,
-  time   : element.Time(),
-  origin : origin,
-  color  : element.Color,
-  });
-  traveltime.hide = function(){
-    this._mapView.ctx_.canvas.style.display = 'none';
-  }
-  traveltime.on('show', function(data){
-    var polyCoords = [];
-    var count = 0;
-    element.traveltime._data.forEach(function(array,index2){
-      if (array[2]<=element.Time()*60){
-        polyCoords[count]=[array[0],array[1]];
-        count++
-      }
-    })
-    polyCoords = convexHull(polyCoords);
-    polyCoords.forEach(function(array, index){
-      polyCoords[index] = new polyPoint(array[0],array[1]);
-    })
-    element.polygon = new google.maps.Polygon({
-      paths: polyCoords,
-      strokeColor: element.Color,
-      strokeOpacity: 0.8,
-      strokeWeight: 3,
-      fillColor: '',
-      fillOpacity: 0.0
-    });
-    element.polygon.setMap(map);
-  })
-  return traveltime;
-}
-
-GetYelpData('coffee','Alexandria,VA');
-
-var yelpResults;
-
-function GetYelpData(category, address){
-  function nonce_generate() {
-    return (Math.floor(Math.random() * 1e12).toString());
-  }
-
-  var yelp_url = YELP_BASE_URL
-    var parameters = {
-      location: address,
-      category_filter: category,
-      oauth_consumer_key: Consumer_Key,
-      oauth_token: Token,
-      oauth_nonce: nonce_generate(),
-      oauth_timestamp: Math.floor(Date.now()/1000),
-      oauth_signature_method: 'HMAC-SHA1',
-      oauth_version : '1.0',
-      callback: 'cb'              // This is crucial to include for jsonp implementation in AJAX or else the oauth-signature will be wrong.
-    };
-
-    var encodedSignature = oauthSignature.generate('GET',yelp_url, parameters, Consumer_Secret, Token_Secret);
-    parameters.oauth_signature = encodedSignature;
-
-    var settings = {
-      url: yelp_url,
-      data: parameters,
-      cache: true,                // This is crucial to include as well to prevent jQuery from adding on a cache-buster parameter "_=23489489749837", invalidating our oauth-signature
-      dataType: 'jsonp',
-      success: function(results) {
-        viewModel.DisplayYelpResults(results);
-      },
-      fail: function() {
-      }
-    };
-
-    // Send AJAX query via jQuery library.
-    $.ajax(settings);
-}
-
-
-
-
-
-
-
 
 
 //credit to: https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain for the below code
