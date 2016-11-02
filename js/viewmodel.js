@@ -1,10 +1,9 @@
-
 var latlng;
 var address;
 var map, geocoder;
 var viewModel;
 var YELP_BASE_URL = 'https://api.yelp.com/v2/search/?'
-
+var yelpResults;
 var polyPoint = function(lat,lng){
   this.lat = lat;
   this.lng = lng;
@@ -205,9 +204,9 @@ function ViewModel() {
   }
 
   self.commuteModes = ko.observableArray([new commuteMode('Walk', undefined,'#008744'),
-    new commuteMode('Drive',5,'#0057e7'),
+    new commuteMode('Drive',undefined,'#0057e7'),
     new commuteMode('Transit', 6,'#d62d20'),
-    new commuteMode('Bike', undefined,'#ffa700')
+    new commuteMode('Bike', 10,'#ffa700')
   ]);
 
   var bounds = new google.maps.LatLngBounds();
@@ -254,7 +253,7 @@ function ViewModel() {
     }
     if (commuteMode.Time()>0){
       commuteMode.traveltime = CreateTravelTime(commuteMode,origin);
-      self.updateYelp(commuteMode);
+      // self.updateYelp(commuteMode);
     }
     var hideUpdateCtx = setInterval(function(){
       if(typeof commuteMode.traveltime._mapView !== "undefined"){
@@ -267,8 +266,6 @@ function ViewModel() {
       }
     },10);
   }
-  var noPolygon;
-  var markers = [];
 
   //yelp category filter
   self.filter = ko.observable("")
@@ -297,26 +294,62 @@ function ViewModel() {
       return nObj
     });
 
-    self.commuteModes().forEach(function(commuteMode){
-      if (commuteMode.polygon){
-        noPolygon = false;
-        yelpResults.forEach(function(result){
-          var googleLatLng =  new google.maps.LatLng(result.location);
+    yelpResults.forEach(function(result){
+      var googleLatLng =  new google.maps.LatLng(result.location);
+      self.commuteModes().forEach(function(commuteMode){
+        if (commuteMode.polygon){
           if (google.maps.geometry.poly.containsLocation(googleLatLng, commuteMode.polygon)){
-            result.display = true;
-            markers.push(new google.maps.Marker({
+            selectAndAssign(commuteMode,result,true);
+            result.marker = new google.maps.Marker({
               position: googleLatLng,
               map: map,
               animation: google.maps.Animation.DROP,
               title: result.name
-            }));
+            });
+            result.marker.addListener('click',
+            function() {
+              if (result.marker.getAnimation() !== null) {
+                result.marker.setAnimation(null);
+              } else {
+                result.marker.setAnimation(google.maps.Animation.BOUNCE);
+              }
+            })
+          }else{
+            selectAndAssign(commuteMode,result,false);
           }
-        })
+        }
       }
-    })
+    )}
+  )}
+  GetYelpData('coffee', self.address());
   }
-    GetYelpData('coffee', self.address());
-  }
+
+function selectAndAssign(commuteMode, result, value){
+  switch(commuteMode.Mode) {
+    case 'Walk':
+        result.walk = value;
+        break;
+    case 'Drive':
+        result.drive = value;
+        break;
+    case 'Transit':
+        result.transit = value;
+        break;
+    case 'Bike':
+        result.bike = value;
+        break;
+    }
+}
+
+// function() {
+//   if (marker.getAnimation() !== google.maps.Animation.BOUNCE) {
+//     marker.setAnimation(null);
+//   } else {
+//     marker.setAnimation(google.maps.Animation.BOUNCE);
+//   }
+// }
+
+
 
 
 //credit to: https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain for the below code
