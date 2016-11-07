@@ -268,21 +268,42 @@ function ViewModel() {
   }
 
   //yelp category filter
-  self.filter = ko.observable("")
-  self.filteredItems = ko.computed(function() {
-    var filter = self.filter().toLowerCase();
-    if (!filter) {
-        //return top 3 results from entire list in the format "parentCategory > category"
-        return categories.map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
-    } else {
-      //return top 3 results which match the entered text in the format parentCategory > category"
-        return ko.utils.arrayFilter(categories, function(item) {
-          return stringStartsWith(item.title.toLowerCase(), filter);
-        }).map(function(a) {return a.parents[0] + ">" + a.title;}).slice(0,3);
-      }
-    }).extend({ notify: 'always' });
+  self.filter = ko.observable("");
+  var displayCategories = categories.map(function(a) {return a.title;});
+  self.filteredItems = ko.observable(displayCategories);
+
+  self.updateYelp = function(){
+    var MatchIndex = categories.findIndex(function(element){
+      return element.title === self.filter();
+    })
+    if (MatchIndex >-1){
+      var CategoryAlias = categories[MatchIndex].alias;
+      markers.forEach(function(marker){
+        marker.setMap(null)
+        marker=null
+      })
+      GetYelpData(CategoryAlias, self.address());
+    }
+  }
+
+  // ko.computed(function() {
+  //   var filter = self.filter().toLowerCase();
+  //   if (!filter) {
+  //       //return top 3 results from entire list in the format "parentCategory > category"
+        // return categories.map(function(a) {return a.parents[0] + ">" + a.title;});
+  //       // .slice(0,3);
+  //   } else {
+  //     //return top 3 results which match the entered text in the format parentCategory > category"
+  //       return ko.utils.arrayFilter(categories, function(item) {
+  //         return stringStartsWith(item.title.toLowerCase(), filter);
+  //       }).map(function(a) {return a.parents[0] + ">" + a.title;});
+  //       // .slice(0,3);
+  //     }
+  //   }).extend({ notify: 'always' });
 
   //yelp data
+  var markers = [];
+
   self.DisplayYelpResults = function(results){
     yelpResults = results.businesses.map(function(obj){
       var nObj = {}
@@ -314,6 +335,7 @@ function ViewModel() {
                 result.marker.setAnimation(google.maps.Animation.BOUNCE);
               }
             })
+            markers.push(result.marker);
           }else{
             selectAndAssign(commuteMode,result,false);
           }
@@ -321,7 +343,7 @@ function ViewModel() {
       }
     )}
   )}
-  GetYelpData('coffee', self.address());
+
   }
 
 function selectAndAssign(commuteMode, result, value){

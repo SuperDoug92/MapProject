@@ -47,9 +47,9 @@
             <div id="slider-form" data-bind="css: {open: foursquareVisible}">
               <div class="input-group">
                 <span class="input-group-addon" id="basic-addon1" data-bind="">Category</span>
-                <input list="browsers" data-bind="textInput: filter" type="text" class="form-control" placeholder="select a category" aria-describedby="basic-addon1">
-                <datalist id="browsers" data-bind="foreach: filteredItems">
-                  <option data-bind="value:$data"></option>
+                <input list="categories" data-bind="textInput: filter, event:{change:updateYelp}" type="text" class="form-control" placeholder="select a category" aria-describedby="basic-addon1">
+                <datalist id="categories" data-bind="foreach: filteredItems">
+                  <option data-bind="value:$data">
                 </datalist>
               </div>
             </div>
