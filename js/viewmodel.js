@@ -3,7 +3,6 @@ var address;
 var map, geocoder;
 var viewModel;
 var YELP_BASE_URL = 'https://api.yelp.com/v2/search/?'
-var yelpResults;
 var polyPoint = function(lat,lng){
   this.lat = lat;
   this.lng = lng;
@@ -20,12 +19,10 @@ function initMap(){
     });
   });
 }
-
 function setViewModel(){
   viewModel = new ViewModel();
   ko.applyBindings(viewModel);
 };
-
 function getUserLocation(callback){
   var userLocation = {};
   if(navigator.geolocation) {
@@ -90,7 +87,6 @@ function reverseGeocode(latlng, callback){
     }
   });
 }
-
 function CreateTravelTime(element, origin){
   var traveltime = new walkscore.TravelTime({
   map    : map,
@@ -127,7 +123,6 @@ function CreateTravelTime(element, origin){
   })
   return traveltime;
 }
-
 function GetYelpData(category, address){
   function nonce_generate() {
     return (Math.floor(Math.random() * 1e12).toString());
@@ -303,19 +298,22 @@ function ViewModel() {
 
   //yelp data
   var markers = [];
+  self.yelpResults = ko.observable("")
 
   self.DisplayYelpResults = function(results){
-    yelpResults = results.businesses.map(function(obj){
+    console.log(results);
+    self.yelpResults = results.businesses.map(function(obj){
       var nObj = {}
       nObj.location = {};
       nObj.location.lat = obj.location.coordinate.latitude;
       nObj.location.lng = obj.location.coordinate.longitude;
       nObj.name = obj.name;
+      nObj.image_url = obj.image_url;
       nObj.display = false;
       return nObj
     });
 
-    yelpResults.forEach(function(result){
+    self.yelpResults.forEach(function(result){
       var googleLatLng =  new google.maps.LatLng(result.location);
       self.commuteModes().forEach(function(commuteMode){
         if (commuteMode.polygon){
@@ -339,6 +337,10 @@ function ViewModel() {
           }else{
             selectAndAssign(commuteMode,result,false);
           }
+          result.display = ko.computed(function(){
+            if (result.walk||result.drive||result.transit||result.bike){return true;}
+            else{return false;}
+          })
         }
       }
     )}
@@ -349,16 +351,16 @@ function ViewModel() {
 function selectAndAssign(commuteMode, result, value){
   switch(commuteMode.Mode) {
     case 'Walk':
-        result.walk = value;
+        result.walk = ko.observable(value);
         break;
     case 'Drive':
-        result.drive = value;
+        result.drive = ko.observable(value);
         break;
     case 'Transit':
-        result.transit = value;
+        result.transit = ko.observable(value);
         break;
     case 'Bike':
-        result.bike = value;
+        result.bike = ko.observable(value);
         break;
     }
 }

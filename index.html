@@ -43,7 +43,7 @@
                 <input data-bind="value: Time, event:{change:$parent.updatePolygon}" type="text" class="form-control" placeholder="time(min)" aria-describedby="basic-addon1">
               </div>
             </div>
-            <button type="button" class="btn btn-default  col-md-12" data-bind="click:togglefoursquare, clickBubble: false">FourSquare</button>
+            <button type="button" class="btn btn-default  col-md-12" data-bind="click:togglefoursquare, clickBubble: false">Yelp</button>
             <div id="slider-form" data-bind="css: {open: foursquareVisible}">
               <div class="input-group">
                 <span class="input-group-addon" id="basic-addon1" data-bind="">Category</span>
@@ -51,6 +51,11 @@
                 <datalist id="categories" data-bind="foreach: filteredItems">
                   <option data-bind="value:$data">
                 </datalist>
+              </div>
+              <div class="btn-group-vertical col-md-12" data-bind="foreach: yelpResults"role="group" aria-label="...">
+                <button type="button"  class="btn btn-default">
+                  <img src="image_url" alt="Smiley face" height="42" width="42">
+                </button>
               </div>
             </div>
           </div>
