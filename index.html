@@ -52,10 +52,12 @@
                   <option data-bind="value:$data">
                 </datalist>
               </div>
-              <div class="btn-group-vertical col-md-12" data-bind="foreach: yelpResults"role="group" aria-label="...">
-                <button type="button"  class="btn btn-default">
-                  <img src="image_url" alt="Smiley face" height="42" width="42">
+              <div class="btn-group-vertical col-md-12" data-bind="foreach: yelpResults"  role="group" aria-label="...">
+                <!-- ko if: display -->
+                <button data-bind="" type="button" data-bind="" class="btn btn-default">
+                  <img data-bind="attr: { src: image_url}" alt="Smiley face" height="42" width="42">
                 </button>
+                <!-- /ko -->
               </div>
             </div>
           </div>

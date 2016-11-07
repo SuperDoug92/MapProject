@@ -301,8 +301,7 @@ function ViewModel() {
   self.yelpResults = ko.observable("")
 
   self.DisplayYelpResults = function(results){
-    console.log(results);
-    self.yelpResults = results.businesses.map(function(obj){
+    self.yelpResults(results.businesses.map(function(obj){
       var nObj = {}
       nObj.location = {};
       nObj.location.lat = obj.location.coordinate.latitude;
@@ -311,9 +310,9 @@ function ViewModel() {
       nObj.image_url = obj.image_url;
       nObj.display = false;
       return nObj
-    });
+    }));
 
-    self.yelpResults.forEach(function(result){
+    self.yelpResults().forEach(function(result){
       var googleLatLng =  new google.maps.LatLng(result.location);
       self.commuteModes().forEach(function(commuteMode){
         if (commuteMode.polygon){
@@ -338,29 +337,38 @@ function ViewModel() {
             selectAndAssign(commuteMode,result,false);
           }
           result.display = ko.computed(function(){
-            if (result.walk||result.drive||result.transit||result.bike){return true;}
+            if (result.walk()||result.drive()||result.transit()||result.bike()){
+              return true;}
             else{return false;}
           })
         }
       }
-    )}
-  )}
+    )})
+    self.yelpResults.valueHasMutated();
+    console.log(self.yelpResults().map(function(result){
+      return result.display();
+    }));
+  }
 
   }
 
 function selectAndAssign(commuteMode, result, value){
+  result.walk = ko.observable(false);
+  result.drive = ko.observable(false);
+  result.transit = ko.observable(false);
+  result.bike = ko.observable(false);
   switch(commuteMode.Mode) {
     case 'Walk':
-        result.walk = ko.observable(value);
+        result.walk(value);
         break;
     case 'Drive':
-        result.drive = ko.observable(value);
+        result.drive(value);
         break;
     case 'Transit':
-        result.transit = ko.observable(value);
+        result.transit(value);
         break;
     case 'Bike':
-        result.bike = ko.observable(value);
+        result.bike(value);
         break;
     }
 }
