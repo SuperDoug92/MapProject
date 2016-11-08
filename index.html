@@ -44,7 +44,7 @@
               </div>
             </div>
             <button type="button" class="btn btn-default  col-md-12" data-bind="click:toggleyelp, clickBubble: false">Yelp</button>
-            <div id="slider-form" data-bind="css: {open: yelpVisible}">
+            <div id="slider-form" data-bind="css: {open2: yelpVisible}">
               <div class="input-group">
                 <span class="input-group-addon" id="basic-addon1" data-bind="">Category</span>
                 <input list="categories" data-bind="textInput: filter, event:{change:updateYelp}" type="text" class="form-control" placeholder="select a category" aria-describedby="basic-addon1">
@@ -52,7 +52,7 @@
                   <option data-bind="value:$data">
                 </datalist>
               </div>
-              <div class="btn-group-vertical col-md-12" data-bind="foreach: yelpResults"  role="group" aria-label="...">
+              <div class="btn-group-vertical col-md-12 yelpResults" data-bind="foreach: yelpResults"  role="group" aria-label="...">
                 <!-- ko if: display -->
                 <button data-bind="" type="button" data-bind="" class="btn btn-default">
                   <div class="row">

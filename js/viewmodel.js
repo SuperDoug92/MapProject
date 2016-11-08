@@ -201,8 +201,8 @@ function ViewModel() {
 
   self.commuteModes = ko.observableArray([new commuteMode('Walk', undefined,'#008744'),
     new commuteMode('Drive',undefined,'#0057e7'),
-    new commuteMode('Transit', 6,'#d62d20'),
-    new commuteMode('Bike', 10,'#ffa700')
+    new commuteMode('Transit', 20,'#d62d20'),
+    new commuteMode('Bike', 50,'#ffa700')
   ]);
 
   var bounds = new google.maps.LatLngBounds();
@@ -320,7 +320,7 @@ function ViewModel() {
       nObj.image_url = obj.image_url;
       nObj.rating_img_url = obj.rating_img_url;
       nObj.address = obj.location.address[1] + ", " + obj.location.city + ", " + obj.location.state
-      nObj.display = false;
+      nObj.display = ko.observable(false);
       return nObj
     }));
 
@@ -348,16 +348,15 @@ function ViewModel() {
           }else{
             selectAndAssign(commuteMode,result,false);
           }
-          result.display = ko.computed(function(){
-            if (result.walk()||result.drive()||result.transit()||result.bike()){
-              return true;}
-            else{return false;}
-          })
+          result.display(result.walk()||result.drive()||result.transit()||result.bike())
+          // = ko.pureComputed(function(){
+          //   if (result.walk()||result.drive()||result.transit()||result.bike()){
+          //     return true;}
+          //   else{return false;}
+          // })
         }
       }
     )})
-    self.yelpResults.valueHasMutated();
-    // console.log(self.yelpResults());
     console.log(self.yelpResults().map(function(result){
       return result.display();
     }));

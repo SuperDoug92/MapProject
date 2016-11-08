@@ -89,6 +89,11 @@ html, body { height:100%; }
   padding-top:5px;
 }
 
+#slider-form.open2{
+  height:100%;
+  padding-top:5px;
+}
+
 .input-group-addon {
     min-width:70px;// if you want width please write here //
 }
@@ -111,7 +116,6 @@ html, body { height:100%; }
   text-align: left;
   font-size: 14px;
   font-weight: bold;
-  overflow-wrap: break-word;
 }
 
 .yelpImg{
@@ -129,4 +133,10 @@ html, body { height:100%; }
 .col-md-10{
   padding-right: 10px;
   padding-left: 10px;
+}
+
+.yelpResults{
+  height:285px;
+  overflow-x:hidden;
+  overflow-y: scroll;
 }
