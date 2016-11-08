@@ -248,15 +248,17 @@ function ViewModel() {
       commuteMode.polygon.setMap(null)
     }
     if (commuteMode.Time()>0){
-      console.log(self.latlng());
-      commuteMode.traveltime = CreateTravelTime(commuteMode,self.latlng());
+      commuteMode.traveltime =
+      CreateTravelTime(commuteMode,self.latlng().lat+","+self.latlng().lng);
     }
     var hideUpdateCtx = setInterval(function(){
-      if(typeof commuteMode.traveltime._mapView !== "undefined"){
-        if(typeof commuteMode.traveltime._mapView.ctx_ !== "undefined"){
-          if(typeof commuteMode.traveltime._mapView.ctx_.canvas !== "undefined"){
-            commuteMode.traveltime.hide();
-            clearInterval(hideUpdateCtx);
+      if(typeof commuteMode.traveltime !== "undefined"){
+        if(typeof commuteMode.traveltime._mapView !== "undefined"){
+          if(typeof commuteMode.traveltime._mapView.ctx_ !== "undefined"){
+            if(typeof commuteMode.traveltime._mapView.ctx_.canvas !== "undefined"){
+              commuteMode.traveltime.hide();
+              clearInterval(hideUpdateCtx);
+            }
           }
         }
       }
