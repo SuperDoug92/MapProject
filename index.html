@@ -43,8 +43,8 @@
                 <input data-bind="value: Time, event:{change:$parent.updatePolygon}" type="text" class="form-control" placeholder="time(min)" aria-describedby="basic-addon1">
               </div>
             </div>
-            <button type="button" class="btn btn-default  col-md-12" data-bind="click:togglefoursquare, clickBubble: false">Yelp</button>
-            <div id="slider-form" data-bind="css: {open: foursquareVisible}">
+            <button type="button" class="btn btn-default  col-md-12" data-bind="click:toggleyelp, clickBubble: false">Yelp</button>
+            <div id="slider-form" data-bind="css: {open: yelpVisible}">
               <div class="input-group">
                 <span class="input-group-addon" id="basic-addon1" data-bind="">Category</span>
                 <input list="categories" data-bind="textInput: filter, event:{change:updateYelp}" type="text" class="form-control" placeholder="select a category" aria-describedby="basic-addon1">

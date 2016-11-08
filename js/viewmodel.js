@@ -59,7 +59,8 @@ function geocode(address, callback){
           var resultBounds = new google.maps.LatLngBounds(
             results[0].geometry.viewport.getSouthWest(),     results[0].geometry.viewport.getNorthEast()
           );
-          callback(resultBounds);
+          var newLatLng = results[0].geometry.location
+          callback(newLatLng, resultBounds);
         } else {
           window.alert('We could not find that location - try entering a more specific place.');
         }
@@ -160,7 +161,6 @@ function GetYelpData(category, address){
     $.ajax(settings);
 }
 
-
 function ViewModel() {
   var self = this;
   //map
@@ -168,17 +168,18 @@ function ViewModel() {
   self.address = ko.observable(address);
   self.updateMap = function (data, event) {
     if (event.which == 13 || event.which == 1) {
-      geocode(self.address(), function(returned_latlng){
-        map.fitBounds(returned_latlng);
-        self.latlng(returned_latlng);
+      geocode(self.address(), function(newLatLng, resultBounds){
+        map.fitBounds(resultBounds);
+        self.latlng(newLatLng);
       });
     }
     return true;
   };
+
   //nav behavior
   self.navVisible = ko.observable(false);
   self.commuteVisible = ko.observable(false);
-  self.foursquareVisible = ko.observable(false);
+  self.yelpVisible = ko.observable(false);
 
   self.toggleNav = function(){
     self.navVisible(!self.navVisible());  }
@@ -188,8 +189,8 @@ function ViewModel() {
   self.toggleCommute = function(){
     self.commuteVisible(!self.commuteVisible());
   }
-  self.togglefoursquare = function(){
-    self.foursquareVisible(!self.foursquareVisible());
+  self.toggleyelp = function(){
+    self.yelpVisible(!self.yelpVisible());
   }
   //polygons
     var commuteMode = function(Mode, Time, Color){
@@ -247,8 +248,8 @@ function ViewModel() {
       commuteMode.polygon.setMap(null)
     }
     if (commuteMode.Time()>0){
-      commuteMode.traveltime = CreateTravelTime(commuteMode,origin);
-      // self.updateYelp(commuteMode);
+      console.log(self.latlng());
+      commuteMode.traveltime = CreateTravelTime(commuteMode,self.latlng());
     }
     var hideUpdateCtx = setInterval(function(){
       if(typeof commuteMode.traveltime._mapView !== "undefined"){
@@ -261,6 +262,14 @@ function ViewModel() {
       }
     },10);
   }
+
+  // self.address.subscribe(function(newValue) {
+  //   if(newValue) {  // Has focus
+  //     self.commuteModes().forEach(
+  //   } else {
+  //      // No focus
+  //    }
+  // });
 
   //yelp category filter
   self.filter = ko.observable("");
