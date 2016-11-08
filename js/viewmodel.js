@@ -301,6 +301,7 @@ function ViewModel() {
   self.yelpResults = ko.observable("")
 
   self.DisplayYelpResults = function(results){
+    console.log(results);
     self.yelpResults(results.businesses.map(function(obj){
       var nObj = {}
       nObj.location = {};
@@ -308,6 +309,8 @@ function ViewModel() {
       nObj.location.lng = obj.location.coordinate.longitude;
       nObj.name = obj.name;
       nObj.image_url = obj.image_url;
+      nObj.rating_img_url = obj.rating_img_url;
+      nObj.address = obj.location.address[1] + ", " + obj.location.city + ", " + obj.location.state
       nObj.display = false;
       return nObj
     }));
@@ -345,6 +348,7 @@ function ViewModel() {
       }
     )})
     self.yelpResults.valueHasMutated();
+    // console.log(self.yelpResults());
     console.log(self.yelpResults().map(function(result){
       return result.display();
     }));

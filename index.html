@@ -53,11 +53,24 @@
                 </datalist>
               </div>
               <div class="btn-group-vertical col-md-12" data-bind="foreach: yelpResults"  role="group" aria-label="...">
-                <!-- ko if: display -->
+
                 <button data-bind="" type="button" data-bind="" class="btn btn-default">
-                  <img data-bind="attr: { src: image_url}" alt="Smiley face" height="42" width="42">
+                  <div class="row">
+                    <img data-bind="attr: {src: image_url}" alt="Smiley face" height="50" width="50" class="col-md-2 yelpImg">
+                    <div class="col-md-10">
+                      <div class="row yelpHeader" data-bind="text: name">
+                      </div>
+                      <div class="row">
+                        <img data-bind="attr: {src: rating_img_url}" alt="Smiley face" class="" align="left">
+                      </div>
+                      <div data-bind="text: address" class="row yelpAddress"></div>
+                    </div>
+                  </div>
+                    <!-- <div data-bind="text: name"></div>
+                    <img data-bind="attr: { src: rating_img_url}" alt="Smiley face" height="42" width="42" class="col-md-3">
+                    <div data-bind="text: address"></div> -->
                 </button>
-                <!-- /ko -->
+
               </div>
             </div>
           </div>

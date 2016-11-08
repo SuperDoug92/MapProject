@@ -106,3 +106,27 @@ html, body { height:100%; }
   transition: visibility 1s, opacity 1s linear;
   transition-delay: 2.5s;
 }
+
+.yelpHeader{
+  text-align: left;
+  font-size: 14px;
+  font-weight: bold;
+  overflow-wrap: break-word;
+}
+
+.yelpImg{
+  padding:0px;
+}
+
+.yelpAddress{
+  text-align: left;
+}
+
+.btn{
+      padding: 6px 6px;
+}
+
+.col-md-10{
+  padding-right: 10px;
+  padding-left: 10px;
+}
