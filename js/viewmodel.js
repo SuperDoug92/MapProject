@@ -249,7 +249,7 @@ function ViewModel() {
     }
     if (commuteMode.Time()>0){
       commuteMode.traveltime =
-      CreateTravelTime(commuteMode,self.latlng().lat+","+self.latlng().lng);
+      CreateTravelTime(commuteMode,self.latlng().lat() + "," + self.latlng().lng());
     }
     var hideUpdateCtx = setInterval(function(){
       if(typeof commuteMode.traveltime !== "undefined"){
