@@ -59,7 +59,8 @@ function geocode(address, callback){
           var resultBounds = new google.maps.LatLngBounds(
             results[0].geometry.viewport.getSouthWest(),     results[0].geometry.viewport.getNorthEast()
           );
-          var newLatLng = results[0].geometry.location
+          var newLatLng = {lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng()}
+          console.log(newLatLng);
           callback(newLatLng, resultBounds);
         } else {
           window.alert('We could not find that location - try entering a more specific place.');
@@ -250,7 +251,7 @@ function ViewModel() {
     }
     if (commuteMode.Time()>0){
       commuteMode.traveltime =
-      CreateTravelTime(commuteMode,self.latlng().lat() + "," + self.latlng().lng());
+      CreateTravelTime(commuteMode,self.latlng().lat + "," + self.latlng().lng);
     }
     var hideUpdateCtx = setInterval(function(){
       if(typeof commuteMode.traveltime !== "undefined"){
@@ -264,15 +265,8 @@ function ViewModel() {
         }
       }
     },10);
+    self.updateYelp();
   }
-
-  // self.address.subscribe(function(newValue) {
-  //   if(newValue) {  // Has focus
-  //     self.commuteModes().forEach(
-  //   } else {
-  //      // No focus
-  //    }
-  // });
 
   //yelp category filter
   self.filter = ko.observable("");
@@ -292,21 +286,6 @@ function ViewModel() {
       GetYelpData(CategoryAlias, self.address());
     }
   }
-
-  // ko.computed(function() {
-  //   var filter = self.filter().toLowerCase();
-  //   if (!filter) {
-  //       //return top 3 results from entire list in the format "parentCategory > category"
-        // return categories.map(function(a) {return a.parents[0] + ">" + a.title;});
-  //       // .slice(0,3);
-  //   } else {
-  //     //return top 3 results which match the entered text in the format parentCategory > category"
-  //       return ko.utils.arrayFilter(categories, function(item) {
-  //         return stringStartsWith(item.title.toLowerCase(), filter);
-  //       }).map(function(a) {return a.parents[0] + ">" + a.title;});
-  //       // .slice(0,3);
-  //     }
-  //   }).extend({ notify: 'always' });
 
   //yelp data
   var markers = [];
@@ -347,6 +326,7 @@ function ViewModel() {
         }
       }
     )})
+
     self.toggleBounce = function(result) {
       if (result.marker.getAnimation() !== null) {
         result.marker.setAnimation(null);
