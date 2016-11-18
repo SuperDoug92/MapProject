@@ -260,12 +260,13 @@ function ViewModel() {
             if(typeof commuteMode.traveltime._mapView.ctx_.canvas !== "undefined"){
               commuteMode.traveltime.hide();
               clearInterval(hideUpdateCtx);
+              self.updateYelp();
             }
           }
         }
       }
     },10);
-    self.updateYelp();
+
   }
 
   //yelp category filter
