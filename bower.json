@@ -1,0 +1,21 @@
+{
+  "name": "Maps",
+  "homepage": "https://github.com/SuperDoug92/MapProject",
+  "description": "Google Maps Project",
+  "main": "",
+  "authors": [
+    "Douglas Clarke"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "oauth-signature": "^1.3.1"
+  }
+}
