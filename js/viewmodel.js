@@ -19,6 +19,7 @@ function initMap(){
     });
   });
 }
+
 function setViewModel(){
   viewModel = new ViewModel();
   ko.applyBindings(viewModel);
@@ -305,6 +306,7 @@ function ViewModel() {
       nObj.display = ko.observable(false);
       return nObj
     }));
+    console.log(self.yelpResults());
 
     self.yelpResults().forEach(function(result){
       var googleLatLng =  new google.maps.LatLng(result.location);
@@ -340,10 +342,11 @@ function ViewModel() {
   }
 
 function selectAndAssign(commuteMode, result, value){
-  result.walk = ko.observable(false);
-  result.drive = ko.observable(false);
-  result.transit = ko.observable(false);
-  result.bike = ko.observable(false);
+  typeof result.walk === 'undefined' ? result.walk = ko.observable(false) : result.walk;
+  typeof result.drive === 'undefined' ? result.drive = ko.observable(false) : result.drive;
+  typeof result.transit === 'undefined' ? result.transit = ko.observable(false) : result.transit;
+  typeof result.bike === 'undefined' ? result.bike = ko.observable(false) : result.bike;
+
   switch(commuteMode.Mode) {
     case 'Walk':
         result.walk(value);
