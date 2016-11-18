@@ -246,6 +246,7 @@ function ViewModel() {
   self.updatePolygon = function(commuteMode){
     if (commuteMode.polygon){
       commuteMode.polygon.setMap(null)
+      delete commuteMode.polygon;
     }
     if (commuteMode.Time()>0){
       commuteMode.traveltime =
