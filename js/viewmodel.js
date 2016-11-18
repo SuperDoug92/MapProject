@@ -312,7 +312,6 @@ function ViewModel() {
   self.yelpResults = ko.observable("")
 
   self.DisplayYelpResults = function(results){
-    console.log(results);
     self.yelpResults(results.businesses.map(function(obj){
       var nObj = {}
       nObj.location = {};
@@ -338,30 +337,22 @@ function ViewModel() {
               animation: google.maps.Animation.DROP,
               title: result.name
             });
-            result.marker.addListener('click',
-            function() {
-              if (result.marker.getAnimation() !== null) {
-                result.marker.setAnimation(null);
-              } else {
-                result.marker.setAnimation(google.maps.Animation.BOUNCE);
-              }
-            })
+            result.marker.addListener('click', function(){self.toggleBounce(result)})
             markers.push(result.marker);
           }else{
             selectAndAssign(commuteMode,result,false);
           }
           result.display(result.walk()||result.drive()||result.transit()||result.bike())
-          // = ko.pureComputed(function(){
-          //   if (result.walk()||result.drive()||result.transit()||result.bike()){
-          //     return true;}
-          //   else{return false;}
-          // })
         }
       }
     )})
-    console.log(self.yelpResults().map(function(result){
-      return result.display();
-    }));
+    self.toggleBounce = function(result) {
+      if (result.marker.getAnimation() !== null) {
+        result.marker.setAnimation(null);
+      } else {
+        result.marker.setAnimation(google.maps.Animation.BOUNCE);
+      }
+    }
   }
 
   }

@@ -54,9 +54,9 @@
               </div>
               <div class="btn-group-vertical col-md-12 yelpResults" data-bind="foreach: yelpResults"  role="group" aria-label="...">
                 <!-- ko if: display -->
-                <button data-bind="" type="button" data-bind="" class="btn btn-default">
+                <button type="button" data-bind="click: $parent.toggleBounce, clickBubble: false" class="btn btn-default">
                   <div class="row">
-                    <img data-bind="attr: {src: image_url}" alt="Smiley face" height="50" width="50" class="col-md-2 yelpImg">
+                    <img data-bind="attr: {src: image_url}" alt="Profile Photo" height="50" width="50" class="col-md-2 yelpImg">
                     <div class="col-md-10">
                       <div class="row yelpHeader" data-bind="text: name">
                       </div>
