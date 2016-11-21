@@ -36,13 +36,6 @@
         </div>
         <div class = "row">
           <div class="btn-group-vertical btn-group-lg col-md-12 nav-button-group" role="group" aria-label="...">
-            <button type="button" id="commute-button" class="btn btn-default col-md-12" data-bind="click:toggleCommute, clickBubble: false">Commute</button>
-            <div id="slider-form" data-bind="css: {open: commuteVisible}, foreach: commuteModes">
-              <div class="input-group">
-                <span class="input-group-addon" id="basic-addon1" data-bind="text: Mode, style: { color: Color}"></span>
-                <input data-bind="value: Time, event:{change:$parent.updatePolygon}" type="text" class="form-control" placeholder="time(min)" aria-describedby="basic-addon1">
-              </div>
-            </div>
             <button type="button" class="btn btn-default  col-md-12" data-bind="click:toggleyelp, clickBubble: false">Yelp</button>
             <div id="slider-form" data-bind="css: {open2: yelpVisible}">
               <div class="input-group">
@@ -58,7 +51,7 @@
                   <div class="row">
                     <img data-bind="attr: {src: image_url}" alt="Profile Photo" height="50" width="50" class="col-md-2 yelpImg">
                     <div class="col-md-10">
-                      <div class="row yelpHeader" data-bind="text: name">
+                        <div class="row yelpHeader" data-bind="text: name">
                       </div>
                       <div class="row">
                         <img data-bind="attr: {src: rating_img_url}" alt="rating" class="" align="left">
@@ -68,6 +61,13 @@
                   </div>
                 </button>
                 <!-- /ko -->
+              </div>
+            </div>
+            <button type="button" id="commute-button" class="btn btn-default col-md-12" data-bind="click:toggleCommute, clickBubble: false">Commute</button>
+            <div id="slider-form" data-bind="css: {open: commuteVisible}, foreach: commuteModes">
+              <div class="input-group">
+                <span class="input-group-addon" id="basic-addon1" data-bind="text: Mode, style: { color: Color}"></span>
+                <input data-bind="value: Time, event:{change:$parent.updatePolygon}" type="text" class="form-control" placeholder="time(min)" aria-describedby="basic-addon1">
               </div>
             </div>
           </div>

@@ -2,6 +2,7 @@ var latlng;
 var address;
 var map, geocoder;
 var viewModel;
+var polygons = [];
 var YELP_BASE_URL = 'https://api.yelp.com/v2/search/?'
 var polyPoint = function(lat,lng){
   this.lat = lat;
@@ -122,6 +123,7 @@ function CreateTravelTime(element, origin){
       fillColor: '',
       fillOpacity: 0.0
     });
+    polygons.push(element.polygon);
     element.polygon.setMap(map);
   })
   return traveltime;
@@ -203,8 +205,8 @@ function ViewModel() {
 
   self.commuteModes = ko.observableArray([new commuteMode('Walk', undefined,'#008744'),
     new commuteMode('Drive',undefined,'#0057e7'),
-    new commuteMode('Transit', 20,'#d62d20'),
-    new commuteMode('Bike', 50,'#ffa700')
+    new commuteMode('Transit', undefined,'#d62d20'),
+    new commuteMode('Bike', undefined,'#ffa700')
   ]);
 
   var bounds = new google.maps.LatLngBounds();
@@ -248,6 +250,7 @@ function ViewModel() {
   self.updatePolygon = function(commuteMode){
     if (commuteMode.polygon){
       commuteMode.polygon.setMap(null)
+      polygons.splice(polygons.indexOf(commuteMode.polygon),1);
       delete commuteMode.polygon;
     }
     if (commuteMode.Time()>0){
@@ -261,7 +264,7 @@ function ViewModel() {
             if(typeof commuteMode.traveltime._mapView.ctx_.canvas !== "undefined"){
               commuteMode.traveltime.hide();
               clearInterval(hideUpdateCtx);
-              self.updateYelp();
+              self.filterResults();
             }
           }
         }
@@ -271,7 +274,7 @@ function ViewModel() {
   }
 
   //yelp category filter
-  self.filter = ko.observable("");
+  self.filter = ko.observable("Coffee & Tea");
   var displayCategories = categories.map(function(a) {return a.title;});
   self.filteredItems = ko.observable(displayCategories);
 
@@ -307,30 +310,32 @@ function ViewModel() {
       return nObj
     }));
     console.log(self.yelpResults());
-
-    self.yelpResults().forEach(function(result){
+    markers = [];
+    self.yelpResults().forEach(function(result, index){
       var googleLatLng =  new google.maps.LatLng(result.location);
-      self.commuteModes().forEach(function(commuteMode){
-        if (commuteMode.polygon){
-          if (google.maps.geometry.poly.containsLocation(googleLatLng, commuteMode.polygon)){
-            selectAndAssign(commuteMode,result,true);
-            result.marker = new google.maps.Marker({
-              position: googleLatLng,
-              map: map,
-              animation: google.maps.Animation.DROP,
-              title: result.name
-            });
-            result.marker.addListener('click', function(){self.toggleBounce(result)})
-            markers.push(result.marker);
-          }else{
-            selectAndAssign(commuteMode,result,false);
-          }
-          result.display(result.walk()||result.drive()||result.transit()||result.bike())
-        }
-      }
-    )})
-
+      result.marker = new google.maps.Marker({
+        position: googleLatLng,
+        map: null,
+        animation: google.maps.Animation.DROP,
+        title: result.name,
+        infowindow: new google.maps.InfoWindow({
+          content: result.name + " " + index
+        })
+      });
+      result.marker.addListener('click', function(){
+        self.toggleBounce(result);
+      })
+      markers.push(result.marker);
+    })
+    self.filterResults();
     self.toggleBounce = function(result) {
+      markers.forEach(function(marker){
+        if (marker !== result.marker){
+          marker.infowindow.close();
+          marker.setAnimation(null);
+        }
+      })
+      result.marker.infowindow.open(map, result.marker);
       if (result.marker.getAnimation() !== null) {
         result.marker.setAnimation(null);
       } else {
@@ -338,6 +343,34 @@ function ViewModel() {
       }
     }
   }
+  self.updateYelp();
+
+  self.filterResults = function(){
+    self.yelpResults().forEach(function(result){
+      self.commuteModes().forEach(function(commuteMode){
+        if (commuteMode.polygon){
+          if (google.maps.geometry.poly.containsLocation(result.marker.position, commuteMode.polygon)){
+            selectAndAssign(commuteMode,result,true);
+          }else{
+            selectAndAssign(commuteMode,result,false);
+          }
+        }
+        else{
+          selectAndAssign(commuteMode,result,false);
+        }
+      })
+      result.display(result.walk()||result.drive()||result.transit()||result.bike());
+      if (polygons.length < 1) {
+        result.display(true);
+      }
+      if (result.display() === true){
+        result.marker.setMap(map);
+      }
+      else{
+        result.marker.setMap(null);
+      }
+    })
+  };
 
   }
 
