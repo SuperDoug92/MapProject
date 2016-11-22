@@ -33,6 +33,7 @@ function getUserLocation(callback){
       callback(userLocation);
     }, function() {
       // handleNoGeolocation(browserSupportFlag);
+      $("alert").text("User location not available, displaying Washington, DC");
       $(".alert").show();
       $(".alert").toggleClass("fadeout");
 
@@ -42,6 +43,7 @@ function getUserLocation(callback){
   }
   // Browser doesn't support Geolocation
   else {
+    $("alert").text("User location not available, displaying Washington, DC");
     $(".alert").show();
     $(".alert").toggleClass("fadeout");
 
@@ -65,11 +67,13 @@ function geocode(address, callback){
           console.log(newLatLng);
           callback(newLatLng, resultBounds);
         } else {
-          window.alert('We could not find that location - try entering a more specific place.');
+          $("alert").text('We could not find that location - try entering a more specific place.');
+          $(".alert").show();
+          $(".alert").toggleClass("fadeout");
         }
-    });
+      });
+    }
   }
-}
 function reverseGeocode(latlng, callback){
   geocoder.geocode({'location': latlng}, function(results, status) {
     if (status === 'OK') {
@@ -84,10 +88,14 @@ function reverseGeocode(latlng, callback){
           var address = components.join(', ');
         callback(address);
       } else {
-        window.alert('No results found');
+        $("alert").text('No results found');
+        $(".alert").show();
+        $(".alert").toggleClass("fadeout");
       }
     } else {
-      window.alert('Geocoder failed due to: ' + status);
+      $("alert").text('Geocoder failed due to: ' + status);
+      $(".alert").show();
+      $(".alert").toggleClass("fadeout");
     }
   });
 }
@@ -158,7 +166,11 @@ function GetYelpData(category, address){
       success: function(results) {
         viewModel.DisplayYelpResults(results);
       },
-      fail: function() {
+      error: function (request, status, error){
+        console.log(error);
+        $(".alert").text("Unable to retrieve yelp results");
+        $(".alert").show();
+        $(".alert").toggleClass("fadeout");
       }
     };
 

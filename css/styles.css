@@ -102,6 +102,8 @@ html, body { height:100%; }
   visibility: hidden;
 }
 
+.alert.show
+
 .alert.fadeout{
   visibility: hidden;
   opacity: 0;
