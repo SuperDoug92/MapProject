@@ -37,12 +37,12 @@
         <div class = "row">
           <div class="btn-group-vertical btn-group-lg" role="group" aria-label="...">
             <button type="button" class="btn btn-default  col-md-12" data-bind="click:toggleyelp, clickBubble: false">Yelp</button>
-            <div id="slider-form" data-bind="css: {open2: yelpVisible}">
+            <div class="slider-form" data-bind="css: {open2: yelpVisible}">
               <div class="input-group">
-                <span class="input-group-addon" id="basic-addon1" data-bind="">Category</span>
+                <span class="input-group-addon" id="" data-bind="">Category</span>
                 <input list="categories" data-bind="textInput: filter, event:{change:updateYelp}" type="text" class="form-control" placeholder="select a category" aria-describedby="basic-addon1">
                 <datalist id="categories" data-bind="foreach: filteredItems">
-                  <option data-bind="value:$data">
+                  <option data-bind="value:$data"></option>
                 </datalist>
               </div>
               <div class="btn-group-vertical col-md-12 yelpResults" data-bind="foreach: yelpResults"  role="group" aria-label="...">
@@ -64,9 +64,9 @@
               </div>
             </div>
             <button type="button" id="commute-button" class="btn btn-default col-md-12" data-bind="click:toggleCommute, clickBubble: false">Commute</button>
-            <div id="slider-form" data-bind="css: {open: commuteVisible}, foreach: commuteModes">
+            <div class="slider-form" data-bind="css: {open: commuteVisible}, foreach: commuteModes">
               <div class="input-group">
-                <span class="input-group-addon" id="basic-addon1" data-bind="text: Mode, style: { color: Color}"></span>
+                <span class="input-group-addon" id="" data-bind="text: Mode, style: { color: Color}"></span>
                 <input data-bind="value: Time, event:{change:$parent.updatePolygon}" type="text" class="form-control" placeholder="time(min)" aria-describedby="basic-addon1">
               </div>
             </div>
@@ -74,7 +74,7 @@
         </div>
       </nav>
       <div id="hamburger" data-bind="click:toggleNav, clickBubble: false">
-        <img id = "hamburger_icon"src='../images/menu_icon.png'>
+        <img id = "hamburger_icon" src="../images/menu_icon.png">
       </div>
       <div id="map" data-bind="click:hideNav, clickBubble: false">
     </div>

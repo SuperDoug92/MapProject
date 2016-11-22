@@ -70,7 +70,7 @@ html, body { height:100%; }
   margin-right: 2px;
 }
 
-#slider-form{
+.slider-form{
   padding:0px 2px 0px;
   height:0px;
   border-left:1px solid #ccc;
@@ -81,12 +81,12 @@ html, body { height:100%; }
   -o-transition: height 1s ease;
   transition: height, .5s ease;
 }
-#slider-form.open{
+.slider-form.open{
   height:180px;
   padding-top:5px;
 }
 
-#slider-form.open2{
+.slider-form.open2{
   height:100%;
   padding-top:5px;
 }

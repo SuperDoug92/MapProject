@@ -388,10 +388,10 @@ function ViewModel() {
   }
 
 function selectAndAssign(commuteMode, result, value){
-  typeof result.walk === 'undefined' ? result.walk = ko.observable(false) : result.walk;
-  typeof result.drive === 'undefined' ? result.drive = ko.observable(false) : result.drive;
-  typeof result.transit === 'undefined' ? result.transit = ko.observable(false) : result.transit;
-  typeof result.bike === 'undefined' ? result.bike = ko.observable(false) : result.bike;
+  if (typeof result.walk === 'undefined'){result.walk = ko.observable(false);}
+  if (typeof result.drive === 'undefined'){result.drive = ko.observable(false);}
+  if (typeof result.transit === 'undefined'){result.transit = ko.observable(false);}
+  if (typeof result.bike === 'undefined'){result.bike = ko.observable(false);}
 
   switch(commuteMode.Mode) {
     case 'Walk':
