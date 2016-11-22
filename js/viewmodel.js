@@ -320,7 +320,7 @@ function ViewModel() {
         animation: google.maps.Animation.DROP,
         title: result.name,
         infowindow: new google.maps.InfoWindow({
-          content: result.name + " " + index
+          content: result.name + " (" + result.location.lat+ "," + result.location.lng + ")"
         })
       });
       result.marker.addListener('click', function(){

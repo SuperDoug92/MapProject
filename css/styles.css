@@ -46,9 +46,6 @@ html, body { height:100%; }
 .input-group{
   margin-bottom: 10px;
 }
-.nav-button-group{
-  min-width: 300px;
-}
 
 #hamburger{
   width:48px;
@@ -139,4 +136,8 @@ html, body { height:100%; }
   height:285px;
   overflow-x:hidden;
   overflow-y: scroll;
+}
+
+.btn-group-vertical{
+  display:block;
 }
