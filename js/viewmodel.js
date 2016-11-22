@@ -3,11 +3,11 @@ var address;
 var map, geocoder;
 var viewModel;
 var polygons = [];
-var YELP_BASE_URL = 'https://api.yelp.com/v2/search/?'
+var YELP_BASE_URL = 'https://api.yelp.com/v2/search/?';
 var polyPoint = function(lat,lng){
   this.lat = lat;
   this.lng = lng;
-}
+};
 
 function initMap(){
   geocoder = new google.maps.Geocoder();
@@ -24,7 +24,7 @@ function initMap(){
 function setViewModel(){
   viewModel = new ViewModel();
   ko.applyBindings(viewModel);
-};
+}
 function getUserLocation(callback){
   var userLocation = {};
   if(navigator.geolocation) {
@@ -52,7 +52,7 @@ function getUserLocation(callback){
 }
 function geocode(address, callback){
   // Make sure the address isn't blank.
-  if (address == '') {
+  if (address === '') {
     window.alert('You must enter an area, or address.');
   } else {
     geocoder.geocode(
@@ -61,7 +61,7 @@ function geocode(address, callback){
           var resultBounds = new google.maps.LatLngBounds(
             results[0].geometry.viewport.getSouthWest(),     results[0].geometry.viewport.getNorthEast()
           );
-          var newLatLng = {lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng()}
+          var newLatLng = {lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng()};
           console.log(newLatLng);
           callback(newLatLng, resultBounds);
         } else {
@@ -78,10 +78,10 @@ function reverseGeocode(latlng, callback){
           var components=[];
           for(var i=0;i<result.length;++i)
           {
-            if(result[i].types[0]=="administrative_area_level_1"){components.push(result[i].long_name)}
-            if(result[i].types[0]=="locality"){components.unshift(result[i].long_name)}
+            if(result[i].types[0]=="administrative_area_level_1"){components.push(result[i].long_name);}
+            if(result[i].types[0]=="locality"){components.unshift(result[i].long_name);}
           }
-          var address = components.join(', ')
+          var address = components.join(', ');
         callback(address);
       } else {
         window.alert('No results found');
@@ -101,20 +101,21 @@ function CreateTravelTime(element, origin){
   });
   traveltime.hide = function(){
     this._mapView.ctx_.canvas.style.display = 'none';
-  }
+  };
   traveltime.on('show', function(data){
+    console.log(data, "2323");
     var polyCoords = [];
     var count = 0;
     element.traveltime._data.forEach(function(array,index2){
       if (array[2]<=element.Time()*60){
         polyCoords[count]=[array[0],array[1]];
-        count++
+        count++;
       }
-    })
+    });
     polyCoords = convexHull(polyCoords);
     polyCoords.forEach(function(array, index){
       polyCoords[index] = new polyPoint(array[0],array[1]);
-    })
+    });
     element.polygon = new google.maps.Polygon({
       paths: polyCoords,
       strokeColor: element.Color,
@@ -125,7 +126,7 @@ function CreateTravelTime(element, origin){
     });
     polygons.push(element.polygon);
     element.polygon.setMap(map);
-  })
+  });
   return traveltime;
 }
 function GetYelpData(category, address){
@@ -133,7 +134,7 @@ function GetYelpData(category, address){
     return (Math.floor(Math.random() * 1e12).toString());
   }
 
-  var yelp_url = YELP_BASE_URL
+  var yelp_url = YELP_BASE_URL;
     var parameters = {
       location: address,
       category_filter: category,
@@ -186,22 +187,22 @@ function ViewModel() {
   self.yelpVisible = ko.observable(false);
 
   self.toggleNav = function(){
-    self.navVisible(!self.navVisible());  }
+    self.navVisible(!self.navVisible());  };
   self.hideNav = function(){
     self.navVisible(false);
-  }
+  };
   self.toggleCommute = function(){
     self.commuteVisible(!self.commuteVisible());
-  }
+  };
   self.toggleyelp = function(){
     self.yelpVisible(!self.yelpVisible());
-  }
+  };
   //polygons
-    var commuteMode = function(Mode, Time, Color){
+  var commuteMode = function(Mode, Time, Color){
     this.Mode = Mode;
     this.Time = ko.observable(Time);
     this.Color = Color;
-  }
+  };
 
   self.commuteModes = ko.observableArray([new commuteMode('Walk', undefined,'#008744'),
     new commuteMode('Drive',undefined,'#0057e7'),
@@ -244,12 +245,12 @@ function ViewModel() {
           }
         }
       }
-    })
+    });
   },10);
 
   self.updatePolygon = function(commuteMode){
     if (commuteMode.polygon){
-      commuteMode.polygon.setMap(null)
+      commuteMode.polygon.setMap(null);
       polygons.splice(polygons.indexOf(commuteMode.polygon),1);
       delete commuteMode.polygon;
     }
@@ -263,15 +264,15 @@ function ViewModel() {
           if(typeof commuteMode.traveltime._mapView.ctx_ !== "undefined"){
             if(typeof commuteMode.traveltime._mapView.ctx_.canvas !== "undefined"){
               commuteMode.traveltime.hide();
-              clearInterval(hideUpdateCtx);
               self.filterResults();
+              clearInterval(hideUpdateCtx);
             }
           }
         }
       }
     },10);
 
-  }
+  };
 
   //yelp category filter
   self.filter = ko.observable("Coffee & Tea");
@@ -281,33 +282,33 @@ function ViewModel() {
   self.updateYelp = function(){
     var MatchIndex = categories.findIndex(function(element){
       return element.title === self.filter();
-    })
+    });
     if (MatchIndex >-1){
       var CategoryAlias = categories[MatchIndex].alias;
       markers.forEach(function(marker){
-        marker.setMap(null)
-        marker=null
-      })
+        marker.setMap(null);
+        marker=null;
+      });
       GetYelpData(CategoryAlias, self.address());
     }
-  }
+  };
 
   //yelp data
   var markers = [];
-  self.yelpResults = ko.observable("")
+  self.yelpResults = ko.observable("");
 
   self.DisplayYelpResults = function(results){
     self.yelpResults(results.businesses.map(function(obj){
-      var nObj = {}
+      var nObj = {};
       nObj.location = {};
       nObj.location.lat = obj.location.coordinate.latitude;
       nObj.location.lng = obj.location.coordinate.longitude;
       nObj.name = obj.name;
       nObj.image_url = obj.image_url;
       nObj.rating_img_url = obj.rating_img_url;
-      nObj.address = obj.location.address[1] + ", " + obj.location.city + ", " + obj.location.state
+      nObj.address = obj.location.address[1] + ", " + obj.location.city + ", " + obj.location.state;
       nObj.display = ko.observable(false);
-      return nObj
+      return nObj;
     }));
     console.log(self.yelpResults());
     markers = [];
@@ -324,9 +325,9 @@ function ViewModel() {
       });
       result.marker.addListener('click', function(){
         self.toggleBounce(result);
-      })
+      });
       markers.push(result.marker);
-    })
+    });
     self.filterResults();
     self.toggleBounce = function(result) {
       markers.forEach(function(marker){
@@ -334,15 +335,15 @@ function ViewModel() {
           marker.infowindow.close();
           marker.setAnimation(null);
         }
-      })
+      });
       result.marker.infowindow.open(map, result.marker);
       if (result.marker.getAnimation() !== null) {
         result.marker.setAnimation(null);
       } else {
         result.marker.setAnimation(google.maps.Animation.BOUNCE);
       }
-    }
-  }
+    };
+  };
   self.updateYelp();
 
   self.filterResults = function(){
@@ -358,7 +359,7 @@ function ViewModel() {
         else{
           selectAndAssign(commuteMode,result,false);
         }
-      })
+      });
       result.display(result.walk()||result.drive()||result.transit()||result.bike());
       if (polygons.length < 1) {
         result.display(true);
@@ -369,7 +370,7 @@ function ViewModel() {
       else{
         result.marker.setMap(null);
       }
-    })
+    });
   };
 
   }
@@ -409,7 +410,7 @@ function selectAndAssign(commuteMode, result, value){
 
 //credit to: https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain for the below code
 function cross(o, a, b) {
-   return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+   return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
 }
 
 // /**
@@ -429,7 +430,7 @@ function convexHull(points) {
    }
 
    var upper = [];
-   for (var i = points.length - 1; i >= 0; i--) {
+   for (i = points.length - 1; i >= 0; i--) {
       while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], points[i]) <= 0) {
          upper.pop();
       }
