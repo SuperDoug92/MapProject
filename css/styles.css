@@ -102,13 +102,15 @@ html, body { height:100%; }
   visibility: hidden;
 }
 
-.alert.show
+.alert.show{
+  visibility:visible;
+}
 
 .alert.fadeout{
+  transition: visibility 5s, opacity 5s ease-in;
+  /*transition-delay: 2s;*/
   visibility: hidden;
   opacity: 0;
-  transition: visibility 1s, opacity 1s linear;
-  transition-delay: 2.5s;
 }
 
 .yelpHeader{

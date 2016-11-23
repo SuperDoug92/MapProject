@@ -21,6 +21,17 @@ function initMap(){
   });
 }
 
+function googleError(){
+  showAlert("An error occured loading google maps");
+}
+
+function showAlert(text){
+  console.log($(".alert"), text);
+  $(".alert").text(text);
+  $(".alert").css('visibility', 'visible');
+  $(".alert").toggleClass("fadeout");
+}
+
 function setViewModel(){
   viewModel = new ViewModel();
   ko.applyBindings(viewModel);
@@ -33,20 +44,14 @@ function getUserLocation(callback){
       callback(userLocation);
     }, function() {
       // handleNoGeolocation(browserSupportFlag);
-      $("alert").text("User location not available, displaying Washington, DC");
-      $(".alert").show();
-      $(".alert").toggleClass("fadeout");
-
+      showAlert("User location not available, displaying Washington, DC");
       userLocation = {lat:38.897299, lng:-77.0369};
       callback(userLocation);
     });
   }
   // Browser doesn't support Geolocation
   else {
-    $("alert").text("User location not available, displaying Washington, DC");
-    $(".alert").show();
-    $(".alert").toggleClass("fadeout");
-
+    showAlert("User location not available, displaying Washington, DC");
     userLocation = {lat:38.9072, lng:-77.0369};
     callback(userLocation);
   }
@@ -64,12 +69,9 @@ function geocode(address, callback){
             results[0].geometry.viewport.getSouthWest(),     results[0].geometry.viewport.getNorthEast()
           );
           var newLatLng = {lat:results[0].geometry.location.lat(), lng:results[0].geometry.location.lng()};
-          console.log(newLatLng);
           callback(newLatLng, resultBounds);
         } else {
-          $("alert").text('We could not find that location - try entering a more specific place.');
-          $(".alert").show();
-          $(".alert").toggleClass("fadeout");
+          showAlert('We could not find that location - try entering a more specific place.');
         }
       });
     }
@@ -88,14 +90,10 @@ function reverseGeocode(latlng, callback){
           var address = components.join(', ');
         callback(address);
       } else {
-        $("alert").text('No results found');
-        $(".alert").show();
-        $(".alert").toggleClass("fadeout");
+        showAlert('No results found');
       }
     } else {
-      $("alert").text('Geocoder failed due to: ' + status);
-      $(".alert").show();
-      $(".alert").toggleClass("fadeout");
+      showAlert('Geocoder failed due to: ' + status);
     }
   });
 }
@@ -111,7 +109,6 @@ function CreateTravelTime(element, origin){
     this._mapView.ctx_.canvas.style.display = 'none';
   };
   traveltime.on('show', function(data){
-    console.log(data, "2323");
     var polyCoords = [];
     var count = 0;
     element.traveltime._data.forEach(function(array,index2){
@@ -167,10 +164,7 @@ function GetYelpData(category, address){
         viewModel.DisplayYelpResults(results);
       },
       error: function (request, status, error){
-        console.log(error);
-        $(".alert").text("Unable to retrieve yelp results");
-        $(".alert").show();
-        $(".alert").toggleClass("fadeout");
+        showAlert("Unable to retrieve yelp results");
       }
     };
 
@@ -322,7 +316,6 @@ function ViewModel() {
       nObj.display = ko.observable(false);
       return nObj;
     }));
-    console.log(self.yelpResults());
     markers = [];
     self.yelpResults().forEach(function(result, index){
       var googleLatLng =  new google.maps.LatLng(result.location);
